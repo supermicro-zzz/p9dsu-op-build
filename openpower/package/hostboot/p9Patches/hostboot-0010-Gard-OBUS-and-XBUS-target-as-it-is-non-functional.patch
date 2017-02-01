@@ -1,0 +1,71 @@
+From 2eaa805a667723cf985535659193b19856365602 Mon Sep 17 00:00:00 2001
+From: Prachi Gupta <pragupta@us.ibm.com>
+Date: Thu, 17 Nov 2016 14:35:55 -0600
+Subject: [PATCH] Gard OBUS and XBUS target as it is non-functional
+
+Change-Id: I62a3c50ec9d4aef4322ce862c4c106423b6ef651
+---
+ src/usr/isteps/istep06/host_gard.C | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/src/usr/isteps/istep06/host_gard.C b/src/usr/isteps/istep06/host_gard.C
+index 0b6464d..049b85c 100644
+--- a/src/usr/isteps/istep06/host_gard.C
++++ b/src/usr/isteps/istep06/host_gard.C
+@@ -49,6 +49,7 @@
+ #include  <errl/errludtarget.H>
+ 
+ #include <console/consoleif.H>
++#include <map>
+ 
+ // Custom compile configs
+ #include <config.h>
+@@ -60,9 +61,36 @@
+   #include <diag/attn/attn.H>
+ #endif
+ 
++using namespace TARGETING;
++
+ namespace ISTEP_06
+ {
+ 
++void witherspoon_hacks ()
++{
++    TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace, "--witherspoon hacks--" );
++
++    std::map<TARGETING::TYPE,uint64_t> l_presData;
++    for (TARGETING::TargetIterator target = TARGETING::targetService().begin();
++         target != TARGETING::targetService().end();
++         ++target)
++    {
++        if ((target->getAttr<TARGETING::ATTR_HWAS_STATE>().present))
++        {
++            TARGETING::TYPE l_type = target->getAttr<TARGETING::ATTR_TYPE>();
++            if ((l_type == TARGETING::TYPE_OBUS ) ||
++                (l_type == TARGETING::TYPE_XBUS))
++            {
++                TRACFCOMP(ISTEPS_TRACE::g_trac_isteps_trace, "Prachi: Deconfiguring:0x%08x",
++                        TARGETING::get_huid(*target));
++                HWAS::theDeconfigGard().deconfigureTarget( **target,
++                        HWAS::DeconfigGard::DECONFIGURED_BY_PHYP);
++            }
++        }
++    }
++}
++
++
+ void* host_gard( void *io_pArgs )
+ {
+     TRACDCOMP( ISTEPS_TRACE::g_trac_isteps_trace, "host_gard entry" );
+@@ -118,6 +146,8 @@ void* host_gard( void *io_pArgs )
+                 break;
+             }
+ 
++            witherspoon_hacks();
++
+             if (l_err == NULL)
+             {
+                 //  check and see if we still have enough hardware to continue
+-- 
+1.8.2.2
+
