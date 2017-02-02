@@ -1,0 +1,74 @@
+From 84e48ed937e2dce842e7cca73356d838d26cfdc5 Mon Sep 17 00:00:00 2001
+From: Bill Hoffa <wghoffa@us.ibm.com>
+Date: Wed, 1 Feb 2017 18:04:04 -0600
+Subject: [PATCH] Debug PRD Memory Allocation
+
+Change-Id: Ie3a6047a4706ffa80b804bb1f47ea5aad493dfc2
+---
+ src/usr/diag/prdf/common/rule/prdrLoadChip.C | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/usr/diag/prdf/common/rule/prdrLoadChip.C b/src/usr/diag/prdf/common/rule/prdrLoadChip.C
+index 3cf3e22..30f5ffc 100644
+--- a/src/usr/diag/prdf/common/rule/prdrLoadChip.C
++++ b/src/usr/diag/prdf/common/rule/prdrLoadChip.C
+@@ -5,7 +5,7 @@
+ /*                                                                        */
+ /* OpenPOWER HostBoot Project                                             */
+ /*                                                                        */
+-/* Contributors Listed Below - COPYRIGHT 2016                             */
++/* Contributors Listed Below - COPYRIGHT 2016,2017                        */
+ /* [+] International Business Machines Corp.                              */
+ /*                                                                        */
+ /*                                                                        */
+@@ -143,6 +143,7 @@ errlHndl_t LoadChip(UtilStream & i_stream, Chip & o_chip)
+ 
+         if (o_chip.cv_regCount != 0)
+         {
++            PRDF_INF("LoadChip() Alloc new regs: %d", o_chip.cv_regCount);
+             o_chip.cv_registers = new Register[o_chip.cv_regCount];
+             for (uint32_t i = 0; i < o_chip.cv_regCount; i++)
+             {
+@@ -213,6 +214,7 @@ errlHndl_t LoadChip(UtilStream & i_stream, Chip & o_chip)
+         i_stream >> o_chip.cv_ruleCount;
+         if (o_chip.cv_ruleCount != 0)
+         {
++            PRDF_INF("LoadChip() Alloc new Expr: %d", o_chip.cv_ruleCount);
+             o_chip.cv_rules = new Expr[o_chip.cv_ruleCount];
+             for (uint32_t i = 0; i < o_chip.cv_ruleCount; i++)
+             {
+@@ -227,6 +229,7 @@ errlHndl_t LoadChip(UtilStream & i_stream, Chip & o_chip)
+             i_stream >> o_chip.cv_groupAttn[i];
+         if (o_chip.cv_groupCount != 0)
+         {
++            PRDF_INF("LoadChip() Alloc new Expr/uint16/uint8/eXPR/expor: %d", o_chip.cv_groupCount);
+             o_chip.cv_groups = new Expr * [o_chip.cv_groupCount];
+             o_chip.cv_groupSize = new uint16_t[o_chip.cv_groupCount];
+             o_chip.cv_groupFlags = new uint8_t[o_chip.cv_groupCount];
+@@ -261,6 +264,7 @@ errlHndl_t LoadChip(UtilStream & i_stream, Chip & o_chip)
+                 }
+                 if (0 != o_chip.cv_groupSize[i])
+                 {
++                    PRDF_INF("LoadChip() Alloc new EXPR spot2: %d", o_chip.cv_groupSize[i]);
+                     o_chip.cv_groups[i] = new Expr[o_chip.cv_groupSize[i]];
+                     for (uint32_t j = 0; j < o_chip.cv_groupSize[i]; j++)
+                     {
+@@ -291,6 +295,7 @@ errlHndl_t LoadChip(UtilStream & i_stream, Chip & o_chip)
+         i_stream >> o_chip.cv_actionCount;
+         if (o_chip.cv_actionCount != 0)
+         {
++            PRDF_INF("LoadChip() Alloc read actions new EXPR/uint16_t: %d", o_chip.cv_actionCount);
+             o_chip.cv_actions = new Expr * [o_chip.cv_actionCount];
+             o_chip.cv_actionSize = new uint16_t[o_chip.cv_actionCount];
+             for (uint32_t i = 0; i < o_chip.cv_actionCount; i++)
+@@ -299,6 +304,7 @@ errlHndl_t LoadChip(UtilStream & i_stream, Chip & o_chip)
+                 i_stream >> o_chip.cv_actionSize[i];
+                 if (0 != o_chip.cv_actionSize[i])
+                 {
++                    PRDF_INF("LoadChip() Alloc read actions new EXPR: %d", o_chip.cv_actionSize[i]);
+                     o_chip.cv_actions[i] =
+                             new Expr[o_chip.cv_actionSize[i]];
+                     for (uint32_t j = 0; j < o_chip.cv_actionSize[i]; j++)
+-- 
+1.8.2.2
+
