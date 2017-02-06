@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-P9DSU_XML_VERSION ?= 6f8bbfaf7ec9a7f888eaefcf77dc0f5a0d0b744c
+P9DSU_XML_VERSION ?= 4762899548365089db2603bf9becf6e13762148a
 P9DSU_XML_SITE_METHOD = git
 P9DSU_XML_SITE = git@github.com:supermicro/p9dsu-xml.git
 

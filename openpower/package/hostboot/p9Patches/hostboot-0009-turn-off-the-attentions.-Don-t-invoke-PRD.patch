@@ -1,0 +1,32 @@
+From 9e2aa8cb82e77cf029fe5517e739d2badcaee542 Mon Sep 17 00:00:00 2001
+From: jim <jim.yuan@supermicro.com>
+Date: Fri, 27 Jan 2017 11:50:50 -0800
+Subject: [PATCH] turn off the attentions. Don't invoke PRD.
+
+---
+ src/usr/initservice/istepdispatcher/istepdispatcher.C | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/usr/initservice/istepdispatcher/istepdispatcher.C b/src/usr/initservice/istepdispatcher/istepdispatcher.C
+index a963b58..adfc851 100644
+--- a/src/usr/initservice/istepdispatcher/istepdispatcher.C
++++ b/src/usr/initservice/istepdispatcher/istepdispatcher.C
+@@ -758,6 +758,7 @@ errlHndl_t IStepDispatcher::doIstep(uint32_t i_istep,
+         else if ((true == theStep->taskflags.check_attn) &&
+                  (false == iv_mpiplMode))
+         {
++#if 0
+             TRACDCOMP(g_trac_initsvc,
+                       INFO_MRK"Check for attentions and invoke PRD" );
+ 
+@@ -768,6 +769,7 @@ errlHndl_t IStepDispatcher::doIstep(uint32_t i_istep,
+                 TRACFCOMP( g_trac_initsvc, ERR_MRK"doIstep: error from "
+                           "checkForIplAttentions");
+             }
++#endif
+         }
+ 
+ #ifdef CONFIG_RECONFIG_LOOP_TESTS_ENABLE
+-- 
+2.9.2.windows.1
+
