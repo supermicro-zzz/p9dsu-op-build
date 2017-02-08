@@ -5,8 +5,7 @@
 ################################################################################
 
 P9DSU_XML_VERSION ?= 4762899548365089db2603bf9becf6e13762148a
-P9DSU_XML_SITE_METHOD = git
-P9DSU_XML_SITE = git@github.com:supermicro/p9dsu-xml.git
+P9DSU_XML_SITE ?= $(call github,supermicro,p9dsu-xml,$(P9DSU_XML_VERSION))
 
 P9DSU_XML_LICENSE = Apache-2.0
 P9DSU_XML_DEPENDENCIES = hostboot-install-images openpower-mrw-install-images common-p8-xml-install-images
