@@ -15,13 +15,15 @@ Archives: https://lists.ozlabs.org/pipermail/openpower-firmware/
 
 ## Building an image
 
-To build an image for a Palmetto system:
+To build an image for a P9DSU system:
 
 ```
-git clone --recursive git@github.com:open-power/op-build.git
+git clone --recursive git@github.com:supermicro/p9dsu-op-build.git
 cd op-build
+git checkout p9dsu
+git submodule update
 . op-build-env
-op-build palmetto_defconfig && op-build
+op-build p9dsu_defconfig && op-build
 ```
 
 There are also default configurations for other platforms in
