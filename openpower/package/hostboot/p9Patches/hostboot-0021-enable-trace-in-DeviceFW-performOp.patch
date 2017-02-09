@@ -1,0 +1,25 @@
+From fc6448c31de5707ff32fc751d24cb66ca96cf35f Mon Sep 17 00:00:00 2001
+From: jim <jim.yuan@supermicro.com>
+Date: Wed, 8 Feb 2017 11:44:53 -0800
+Subject: [PATCH] enable trace in DeviceFW:performOp.
+
+---
+ src/usr/devicefw/associator.C | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/usr/devicefw/associator.C b/src/usr/devicefw/associator.C
+index a7bc750..74ce4a8 100644
+--- a/src/usr/devicefw/associator.C
++++ b/src/usr/devicefw/associator.C
+@@ -192,7 +192,7 @@ namespace DeviceFW
+             (i_target == MASTER_PROCESSOR_CHIP_TARGET_SENTINEL) ?
+             TYPE_PROC : i_target->getAttr<ATTR_TYPE>();
+ 
+-        TRACDCOMP(g_traceBuffer, "Device op requested for (%d, %d, %d)",
++        TRACFCOMP(g_traceBuffer, "Device op requested for (%d, %d, %d)",
+                   i_opType, i_accessType, l_devType);
+ 
+         mutex_lock(&iv_mutex);
+-- 
+2.9.2.windows.1
+
