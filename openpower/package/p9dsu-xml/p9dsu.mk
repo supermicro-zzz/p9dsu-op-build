@@ -36,24 +36,29 @@ define P9DSU_XML_BUILD_CMDS
         perl -I $(MRW_HB_TOOLS) \
         $(MRW_HB_TOOLS)/processMrw.pl -x $(MRW_SCRATCH)/p9dsu.xml
 
+        # filter out unwanted attributes
         chmod +x $(MRW_HB_TOOLS)/filter_out_unwanted_attributes.pl
 
        $(MRW_HB_TOOLS)/filter_out_unwanted_attributes.pl \
             --tgt-xml $(MRW_HB_TOOLS)/target_types_merged.xml \
             --tgt-xml $(MRW_HB_TOOLS)/target_types_hb.xml \
             --tgt-xml $(MRW_HB_TOOLS)/target_types_oppowervm.xml \
-            --mrw-xml $(MRW_SCRATCH)/P9DSU_hb.mrw.xml
+            --tgt-xml $(MRW_HB_TOOLS)/target_types_openpower.xml \
+            --mrw-xml $(MRW_SCRATCH)/$(BR2_P9DSU_MRW_XML_FILENAME)
 
-       cp  $(MRW_SCRATCH)/P9DSU_hb.mrw.xml.updated  $(MRW_SCRATCH)/P9DSU_hb.mrw.xml
+        cp $(MRW_SCRATCH)/$(BR2_P9DSU_MRW_XML_FILENAME).updated \
+            $(MRW_SCRATCH)/$(BR2_P9DSU_MRW_XML_FILENAME)
 
         # merge in any system specific attributes, hostboot attributes
         $(MRW_HB_TOOLS)/mergexml.sh $(MRW_SCRATCH)/$(BR2_P9DSU_SYSTEM_XML_FILENAME) \
             $(MRW_HB_TOOLS)/attribute_types.xml \
             $(MRW_HB_TOOLS)/attribute_types_hb.xml \
             $(MRW_HB_TOOLS)/attribute_types_oppowervm.xml \
+            $(MRW_HB_TOOLS)/attribute_types_openpower.xml \
             $(MRW_HB_TOOLS)/target_types_merged.xml \
             $(MRW_HB_TOOLS)/target_types_hb.xml \
             $(MRW_HB_TOOLS)/target_types_oppowervm.xml \
+            $(MRW_HB_TOOLS)/target_types_openpower.xml \
             $(MRW_SCRATCH)/$(BR2_P9DSU_MRW_XML_FILENAME) > $(MRW_HB_TOOLS)/temporary_hb.hb.xml;
 
         # creating the targeting binary
