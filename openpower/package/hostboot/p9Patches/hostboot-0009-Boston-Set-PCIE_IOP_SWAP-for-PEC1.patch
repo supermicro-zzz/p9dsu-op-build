@@ -1,0 +1,38 @@
+From 31bb1c9042ee23acdd6858ef5a579861186885ad Mon Sep 17 00:00:00 2001
+From: Bill Hoffa <wghoffa@us.ibm.com>
+Date: Wed, 22 Feb 2017 15:44:12 -0600
+Subject: [PATCH] Boston - Set PCIE_IOP_SWAP for PEC1
+
+  - Quick Fix to set PCIE_IOP_SWAP for PEC1
+
+Change-Id: I221f8b53bade07ded9a0a7c2df2bb8b32ed40cf8
+---
+ src/usr/targeting/common/processMrw.pl | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/usr/targeting/common/processMrw.pl b/src/usr/targeting/common/processMrw.pl
+index 3464ab6..b190e7d 100644
+--- a/src/usr/targeting/common/processMrw.pl
++++ b/src/usr/targeting/common/processMrw.pl
+@@ -903,7 +903,6 @@ sub processPec
+     my $target       = shift; # PEC
+     my $parentTarget = shift; # PROC
+ 
+-
+     ## process pcie config target
+     ## this is a special target whose children are the different ways
+     ## to configure iop/phb's
+@@ -1078,6 +1077,10 @@ sub processPec
+                     #                         oct($iop_swap_lu[0]),
+                     #                         oct($iop_swap_lu[1]),
+                     #                         oct($iop_swap_lu[2]));
++                    if ($phb_num == 1 || $phb_num == 2) #indicates PEC1
++                    {
++                        $targetObj->setAttribute($target, "PROC_PCIE_IOP_SWAP", "0x01");
++                    }
+                     # $targetObj->setAttribute($target, "PROC_PCIE_IOP_SWAP",
+                     #     $lane_rev_attr0);
+                     # $targetObj->setAttribute($target,
+-- 
+1.8.2.2
+

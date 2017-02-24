@@ -1,0 +1,46 @@
+From e6e59e13e80eaec3376a7d6fe3a72e842cfffb95 Mon Sep 17 00:00:00 2001
+From: Dean Sanner <dsanner@us.ibm.com>
+Date: Tue, 21 Feb 2017 10:09:27 -0600
+Subject: [PATCH v1 1002/1002] Only update SBEs on chips connected to powerbus
+
+  - Fixes issue in istep 7 where HB was attempting
+    to update the slave chip's SBE, as SBE update
+    expects SBE PSU interface to be active
+
+Change-Id: Id90f1b0f23c668a153a7e2725e762c761ee3c490
+---
+ src/usr/sbe/sbe_update.C | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/src/usr/sbe/sbe_update.C b/src/usr/sbe/sbe_update.C
+index c731624..0c97dd2 100644
+--- a/src/usr/sbe/sbe_update.C
++++ b/src/usr/sbe/sbe_update.C
+@@ -299,6 +299,24 @@ namespace SBE
+                     }
+                 }
+ 
++                //Can only update the SBE once the powerbus is up (secureboot)
++                //Use the scom switch Xscom capability flag as a proxy for
++                //powerbus access.  If we can't access via powerbus, then skip
++                TARGETING::ScomSwitches scomSetting =
++                      sbeState.target->getAttr<TARGETING::ATTR_SCOM_SWITCHES>();
++
++                if(!(scomSetting.useXscom))
++                {
++                    //Xscom is not viable on this chip, thus powerbus isn't
++                    //up to chip -- skip it
++                    TRACFCOMP( g_trac_sbe,
++                               INFO_MRK"updateProcessorSbeSeeproms(): "
++                               "Power bus not established to chip 0x%X,"
++                               " not performing update",
++                               TARGETING::get_huid(sbeState.target));
++                    continue;
++                }
++
+                 err = getSbeInfoState(sbeState);
+ 
+                 if (err)
+-- 
+1.8.2.2
+

@@ -1,0 +1,36 @@
+From 4f4f1afbfe5bb2d7b0c12a87a8ccf889f3a0bf41 Mon Sep 17 00:00:00 2001
+From: Bill Hoffa <wghoffa@us.ibm.com>
+Date: Fri, 17 Feb 2017 15:20:27 -0600
+Subject: [PATCH] Revert "i2c: only send 1 master stop in FORCE_UNLOCK reset
+ mode"
+
+Change-Id: I7c09f61f237126d792a6680c7e985332b2685e66
+---
+ src/usr/i2c/i2c.C | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/src/usr/i2c/i2c.C b/src/usr/i2c/i2c.C
+index d8cde87..12bcc62 100755
+--- a/src/usr/i2c/i2c.C
++++ b/src/usr/i2c/i2c.C
+@@ -2724,13 +2724,12 @@ errlHndl_t i2cReset ( TARGETING::Target * i_target,
+                 // So just commit the log here and let the function continue.
+                 errlCommit( err, I2C_COMP_ID );
+             }
+-        } else {
++        }
+ 
+-            // Part of doing the I2C Master reset is also sending a stop
+-            // command to the slave device.
+-            err = i2cSendSlaveStop( i_target,
++        // Part of doing the I2C Master reset is also sending a stop
++        // command to the slave device.
++        err = i2cSendSlaveStop( i_target,
+                                     i_args );
+-        }
+ 
+         if( err )
+         {
+-- 
+1.8.2.2
+

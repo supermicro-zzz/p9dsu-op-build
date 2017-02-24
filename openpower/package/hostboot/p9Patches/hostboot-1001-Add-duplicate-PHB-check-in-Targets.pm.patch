@@ -1,0 +1,54 @@
+From 4469a5a62e91876c0d1114cc605b58dff97dbfd9 Mon Sep 17 00:00:00 2001
+From: Matt Ploetz <maploetz@us.ibm.com>
+Date: Mon, 20 Feb 2017 20:00:22 -0600
+Subject: [PATCH v1 1001/1002] Add duplicate PHB check in Targets.pm
+
+Change-Id: I0cf4bc5d82d3de3b931d2a2415005df2fbcbba81
+---
+ src/usr/targeting/common/Targets.pm | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/src/usr/targeting/common/Targets.pm b/src/usr/targeting/common/Targets.pm
+index d8ee43b..83f6b83 100644
+--- a/src/usr/targeting/common/Targets.pm
++++ b/src/usr/targeting/common/Targets.pm
+@@ -763,10 +763,10 @@ sub iterateOverChiplets
+     }
+     else
+     {
++        my @phb_array = ();
+         foreach my $child (@{ $self->getTargetChildren($target) })
+         {
+-            # For PEC childern, we need to remove any targets that are not
+-            # connected. If no PHB connections are found, do not set attributes
++            # For PEC children, we need to remove duplicate PHB targets
+             if ($tgt_type eq "PEC")
+             {
+                 my $pec_num = $self->getAttribute($target, "CHIP_UNIT");
+@@ -778,13 +778,17 @@ sub iterateOverChiplets
+                 foreach my $phb (@{ $self->getTargetChildren($child) })
+                 {
+                     my $phb_num = $self->getAttribute($phb, "CHIP_UNIT");
+-                    foreach my $pcibus (@{ $self->getTargetChildren($phb) })
++                    # Check if the PHB array value for this PHB is empty
++                    # in the PHB array
++                    if (@phb_array[$phb_num] eq "")
+                     {
+-                        if ($self->getNumConnections($pcibus) > 0)
+-                        {
+-                            $self->setCommonAttrForChiplet
+-                                ($phb, $sys, $node, $proc);
+-                        }
++                        # If it is empty, add it to the array and set it as
++                        # as a target in the MRW. If it is already found we
++                        # skip adding the target as to not have duplicate PHB
++                        # targets
++                        @phb_array[$phb_num] = $phb;
++                        $self->setCommonAttrForChiplet
++                                 ($phb, $sys, $node, $proc);
+                     }
+                 }
+             }
+-- 
+1.8.2.2
+
