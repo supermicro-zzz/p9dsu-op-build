@@ -1,0 +1,50 @@
+From 9a179838e4d52a7c4469458d29315255ab8887fc Mon Sep 17 00:00:00 2001
+From: Michael Neuling <mikey@neuling.org>
+Date: Fri, 15 Sep 2017 10:27:39 +1000
+Subject: [PATCH 4/4] phb4: Use link if degraded
+
+In the recent change:
+ 3f936bae97 phb4: Retrain link if degraded
+We retrain if the link is degraded.  We do 3 retries to get an optimal
+link.
+
+Unfortunately if the last retry fails, we mark the PHB as bad and
+don't use it. Hence that PHB is lost even though it actually trained
+(just degraded).
+
+This fixes the problem by printing an error message (as below) but
+still marking the PHB as good.
+
+  [    7.179320404,3] PHB#0005[0:5]: LINK: Link degraded
+  [    8.387346665,3] PHB#0005[0:5]: LINK: Link degraded
+  [   10.078409137,3] PHB#0005[0:5]: LINK: Link degraded
+  [   11.281477269,3] PHB#0005[0:5]: LINK: Link degraded
+  [   11.283123885,3] PHB#0005[0:5]: LINK: Degraded but no more retries
+
+Signed-off-by: Michael Neuling <mikey@neuling.org>
+---
+ hw/phb4.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/hw/phb4.c b/hw/phb4.c
+index c469797..fea9125 100644
+--- a/hw/phb4.c
++++ b/hw/phb4.c
+@@ -2622,7 +2622,13 @@ static int64_t phb4_poll_link(struct pci_slot *slot)
+ 			PHBDBG(p, "LINK: Link is stable\n");
+ 			if (!phb4_link_optimal(slot)) {
+ 				PHBERR(p, "LINK: Link degraded\n");
+-				return phb4_retry_state(slot);
++				if (slot->link_retries)
++					return phb4_retry_state(slot);
++				/*
++				 * Link is degraded but no more retries, so
++				 * settle for what we have :-(
++				 */
++				PHBERR(p, "LINK: Degraded but no more retries\n");
+ 			}
+ 			pci_slot_set_state(slot, PHB4_SLOT_NORMAL);
+ 			return OPAL_SUCCESS;
+-- 
+2.9.2.windows.1
+
