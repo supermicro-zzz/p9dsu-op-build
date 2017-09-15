@@ -1,0 +1,78 @@
+From 413fd14d7ca8f3bdefbb0ef581878153639f77ee Mon Sep 17 00:00:00 2001
+From: Dan Crowell <dcrowell@us.ibm.com>
+Date: Tue, 22 Aug 2017 13:10:59 -0500
+Subject: [PATCH 5/5] Enable calls to p9_mss_draminit_training_adv
+
+New HWPs from the HW team, added the code into HB istep
+
+Change-Id: I9d5f033db35e09b0d0190266cd3b509a966f8d41
+Reviewed-on: http://ralgit01.raleigh.ibm.com/gerrit1/44989
+Reviewed-by: Daniel M. Crowell <dcrowell@us.ibm.com>
+Reviewed-by: Martin Gloff <mgloff@us.ibm.com>
+Reviewed-by: JACOB L. HARVEY <jlharvey@us.ibm.com>
+Tested-by: Jenkins Server <pfd-jenkins+hostboot@us.ibm.com>
+Tested-by: Jenkins OP Build CI <op-jenkins+hostboot@us.ibm.com>
+Tested-by: Jenkins OP HW <op-hw-jenkins+hostboot@us.ibm.com>
+Tested-by: FSP CI Jenkins <fsp-CI-jenkins+hostboot@us.ibm.com>
+Reviewed-by: William G. Hoffa <wghoffa@us.ibm.com>
+---
+ src/usr/isteps/istep13/call_mss_draminit_trainadv.C | 11 +++++------
+ src/usr/isteps/istep13/makefile                     |  1 +
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/usr/isteps/istep13/call_mss_draminit_trainadv.C b/src/usr/isteps/istep13/call_mss_draminit_trainadv.C
+index 9e3d5bb..f814193 100644
+--- a/src/usr/isteps/istep13/call_mss_draminit_trainadv.C
++++ b/src/usr/isteps/istep13/call_mss_draminit_trainadv.C
+@@ -5,7 +5,7 @@
+ /*                                                                        */
+ /* OpenPOWER HostBoot Project                                             */
+ /*                                                                        */
+-/* Contributors Listed Below - COPYRIGHT 2015,2016                        */
++/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+ /* [+] International Business Machines Corp.                              */
+ /*                                                                        */
+ /*                                                                        */
+@@ -36,6 +36,7 @@
+ 
+ #include    <fapi2.H>
+ #include    <fapi2/plat_hwp_invoker.H>
++#include    <p9_mss_draminit_training_adv.H>
+ 
+ using   namespace   ERRORLOG;
+ using   namespace   ISTEP;
+@@ -60,16 +61,14 @@ void* call_mss_draminit_trainadv (void *io_pArgs)
+     {
+         // Dump current run on target
+         TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,
+-                "Running p9_mss_draminit_trainingadv HWP on "
++                "Running p9_mss_draminit_training_adv HWP on "
+                 "target HUID %.8X", TARGETING::get_huid(l_mcbist_target));
+ 
+         const fapi2::Target<fapi2::TARGET_TYPE_MCBIST>
+           l_fapi_mbcbist_target( l_mcbist_target);
+ 
+-        // PLACEHOLDER - HWP may not actually be required
+-        //  call the HWP with each fapi::Target
+-//         FAPI_INVOKE_HWP(l_err, mss_draminit_training_advanced,
+-//                        l_fapi_mbcbist_target);
++         FAPI_INVOKE_HWP(l_err, p9_mss_draminit_training_adv,
++                        l_fapi_mbcbist_target);
+ 
+         if (l_err)
+         {
+diff --git a/src/usr/isteps/istep13/makefile b/src/usr/isteps/istep13/makefile
+index c4d1861..6c3ba14 100644
+--- a/src/usr/isteps/istep13/makefile
++++ b/src/usr/isteps/istep13/makefile
+@@ -86,6 +86,7 @@ include ${PROCEDURES_PATH}/hwp/memory/p9_mss_draminit.mk
+ include ${PROCEDURES_PATH}/hwp/memory/p9_mss_draminit_training.mk
+ include ${PROCEDURES_PATH}/hwp/memory/p9_mss_draminit_mc.mk
+ include ${PROCEDURES_PATH}/hwp/memory/p9_mss_ddr_phy_reset.mk
++include ${PROCEDURES_PATH}/hwp/memory/p9_mss_draminit_training_adv.mk
+ 
+ include ${ROOTPATH}/config.mk
+ 
+-- 
+2.9.2.windows.1
+

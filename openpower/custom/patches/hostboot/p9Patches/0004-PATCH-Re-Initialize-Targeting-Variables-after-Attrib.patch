@@ -1,0 +1,27 @@
+From d61adf2ff2581bd7734255d7f95c17e8a57f3383 Mon Sep 17 00:00:00 2001
+From: jim <jim.yuan@supermicro.com>
+Date: Fri, 8 Sep 2017 19:41:12 -0700
+Subject: [PATCH 4/5] [PATCH] Re-Initialize Targeting Variables after Attribute
+ Override.
+
+---
+ src/usr/initservice/istepdispatcher/istepdispatcher.C | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/usr/initservice/istepdispatcher/istepdispatcher.C b/src/usr/initservice/istepdispatcher/istepdispatcher.C
+index 78225b3..a76ad15 100644
+--- a/src/usr/initservice/istepdispatcher/istepdispatcher.C
++++ b/src/usr/initservice/istepdispatcher/istepdispatcher.C
+@@ -300,6 +300,9 @@ void IStepDispatcher::init(errlHndl_t &io_rtaskRetErrl)
+ 		
+ #endif
+ 
++		//Update Targeting in the Event Attribute Overrides apply to that logic
++		ERRORLOG::ErrlManager::errlResourceReady(ERRORLOG::TARG);
++
+         if(iv_istepMode)
+         {
+             // In IStep mode (receive messages to run individual steps)
+-- 
+2.9.2.windows.1
+
