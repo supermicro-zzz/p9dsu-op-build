@@ -1,0 +1,314 @@
+From 3eea0b45db9a1afe2db4da4b1e053ceec6e150bc Mon Sep 17 00:00:00 2001
+From: Jacob Harvey <jlharvey@us.ibm.com>
+Date: Fri, 15 Sep 2017 11:31:59 -0500
+Subject: [PATCH] Fix eff_config_thermal allocations
+
+    Remove double for loop in eff_config_thermal
+    Other small optimizations
+
+Change-Id: Idc0af9468f2f34ddfb0f8fcbe3b40a3943a793d5
+Reviewed-on: http://ralgit01.raleigh.ibm.com/gerrit1/46271
+Tested-by: FSP CI Jenkins <fsp-CI-jenkins+hostboot@us.ibm.com>
+Tested-by: Jenkins Server <pfd-jenkins+hostboot@us.ibm.com>
+Reviewed-by: Louis Stermole <stermole@us.ibm.com>
+Reviewed-by: STEPHEN GLANCY <sglancy@us.ibm.com>
+Reviewed-by: ANDRE A. MARIN <aamarin@us.ibm.com>
+Tested-by: Hostboot CI <hostboot-ci+hostboot@us.ibm.com>
+Reviewed-by: Thi N. Tran <thi@us.ibm.com>
+Reviewed-on: http://ralgit01.raleigh.ibm.com/gerrit1/46278
+Reviewed-by: Hostboot Team <hostboot@us.ibm.com>
+Tested-by: Jenkins OP Build CI <op-jenkins+hostboot@us.ibm.com>
+Tested-by: Jenkins OP HW <op-hw-jenkins+hostboot@us.ibm.com>
+Reviewed-by: Daniel M. Crowell <dcrowell@us.ibm.com>
+---
+ .../hwp/memory/lib/power_thermal/decoder.C         | 49 ++++++++-------
+ .../hwp/memory/lib/power_thermal/decoder.H         | 12 ++--
+ .../hwp/memory/p9_mss_eff_config_thermal.C         | 70 +++++++---------------
+ 3 files changed, 54 insertions(+), 77 deletions(-)
+
+diff --git a/src/import/chips/p9/procedures/hwp/memory/lib/power_thermal/decoder.C b/src/import/chips/p9/procedures/hwp/memory/lib/power_thermal/decoder.C
+index f072aea..c56b78f 100644
+--- a/src/import/chips/p9/procedures/hwp/memory/lib/power_thermal/decoder.C
++++ b/src/import/chips/p9/procedures/hwp/memory/lib/power_thermal/decoder.C
+@@ -126,17 +126,17 @@ struct is_match
+     ///@brief functor constructor
+     ///@param[in] i_gen_key the class object's constructed hash for the installed dimm, to be compared with the attr array
+     ///
+-    is_match(const fapi2::buffer<uint32_t> i_gen_key) : iv_gen_key(i_gen_key) {}
++    is_match(const uint32_t i_gen_key) : iv_gen_key(i_gen_key) {}
+     const fapi2::buffer<uint32_t> iv_gen_key;
+ 
+     ///
+     ///@brief Boolean compare used for find_if function
+     ///
+-    bool operator()(const fapi2::buffer<uint64_t> i_hash)
++    bool operator()(const uint64_t i_hash)
+     {
+-        uint32_t l_temp = 0;
+-        i_hash.extractToRight<ENCODING_START, ENCODING_LENGTH>(l_temp);
+-        return ((l_temp & iv_gen_key) == iv_gen_key);
++        // l_this_hash is the first half of the i_hash's bits
++        uint32_t l_this_hash = i_hash >> 32;
++        return ((l_this_hash & iv_gen_key) == iv_gen_key);
+     }
+ };
+ 
+@@ -146,7 +146,7 @@ struct is_match
+ /// @return fapi2::ReturnCode FAPI2_RC_SUCCESS iff the encoding was successful
+ /// @note populates iv_vddr_slope, iv_total_slop
+ ///
+-fapi2::ReturnCode decoder::find_slope (const std::vector<fapi2::buffer<uint64_t>>& i_slope)
++fapi2::ReturnCode decoder::find_slope (const std::vector<uint64_t>& i_slope)
+ {
+     // Find iterator to matching key (if it exists)
+     const auto l_value_iterator  =  std::find_if(i_slope.begin(),
+@@ -182,9 +182,11 @@ fapi2::ReturnCode decoder::find_slope (const std::vector<fapi2::buffer<uint64_t>
+                 iv_kind.iv_mfgid,
+                 iv_dimms_per_port);
+ 
+-    l_value_iterator->extractToRight<VDDR_START, VDDR_LENGTH>( iv_vddr_slope);
+-    l_value_iterator->extractToRight<TOTAL_START, TOTAL_LENGTH>(iv_total_slope);
+-
++    {
++        const fapi2::buffer<uint64_t> l_temp(*l_value_iterator);
++        l_temp.extractToRight<VDDR_START, VDDR_LENGTH>( iv_vddr_slope);
++        l_temp.extractToRight<TOTAL_START, TOTAL_LENGTH>(iv_total_slope);
++    }
+ fapi_try_exit:
+     return fapi2::current_err;
+ }
+@@ -195,13 +197,12 @@ fapi_try_exit:
+ /// @return fapi2::ReturnCode FAPI2_RC_SUCCESS iff the encoding was successful
+ /// @note populates iv_vddr_intercept, iv_total_intercept
+ ///
+-fapi2::ReturnCode decoder::find_intercept (const std::vector<fapi2::buffer<uint64_t>>& i_intercept)
++fapi2::ReturnCode decoder::find_intercept (const std::vector<uint64_t>& i_intercept)
+ {
+     // Find iterator to matching key (if it exists)
+     const auto l_value_iterator  =  std::find_if(i_intercept.begin(),
+                                     i_intercept.end(),
+                                     is_match(iv_gen_key));
+-
+     //Should have matched with the all default ATTR at least
+     //The last value should always be the default value
+     FAPI_ASSERT(l_value_iterator != i_intercept.end(),
+@@ -231,9 +232,11 @@ fapi2::ReturnCode decoder::find_intercept (const std::vector<fapi2::buffer<uint6
+                 iv_kind.iv_mfgid,
+                 iv_dimms_per_port);
+ 
+-    l_value_iterator->extractToRight<VDDR_START, VDDR_LENGTH>( iv_vddr_intercept);
+-    l_value_iterator->extractToRight<TOTAL_START, TOTAL_LENGTH>(iv_total_intercept);
+-
++    {
++        const fapi2::buffer<uint64_t> l_temp(*l_value_iterator);
++        l_temp.extractToRight<VDDR_START, VDDR_LENGTH>( iv_vddr_intercept);
++        l_temp.extractToRight<TOTAL_START, TOTAL_LENGTH>(iv_total_intercept);
++    }
+ fapi_try_exit:
+     return fapi2::current_err;
+ }
+@@ -244,13 +247,15 @@ fapi_try_exit:
+ /// @return fapi2::ReturnCode FAPI2_RC_SUCCESS iff the encoding was successful
+ /// @note populates thermal_power_limit
+ ///
+-fapi2::ReturnCode decoder::find_thermal_power_limit (const std::vector<fapi2::buffer<uint64_t>>& i_thermal_limits)
++fapi2::ReturnCode decoder::find_thermal_power_limit (const std::vector<uint64_t>& i_thermal_limits)
+ {
+     // Find iterator to matching key (if it exists)
+     const auto l_value_iterator  =  std::find_if(i_thermal_limits.begin(),
+                                     i_thermal_limits.end(),
+                                     is_match(iv_gen_key));
+ 
++    fapi2::buffer<uint64_t> l_temp;
++
+     //Should have matched with the all default ATTR at least
+     //The last value should always be the default value
+     FAPI_ASSERT(l_value_iterator != i_thermal_limits.end(),
+@@ -280,8 +285,10 @@ fapi2::ReturnCode decoder::find_thermal_power_limit (const std::vector<fapi2::bu
+                 iv_kind.iv_mfgid,
+                 iv_dimms_per_port);
+ 
+-    l_value_iterator->extractToRight<THERMAL_POWER_START, THERMAL_POWER_LENGTH>( iv_thermal_power_limit);
+-
++    {
++        const fapi2::buffer<uint64_t> l_temp(*l_value_iterator);
++        l_temp.extractToRight<THERMAL_POWER_START, THERMAL_POWER_LENGTH>( iv_thermal_power_limit);
++    }
+ fapi_try_exit:
+     return fapi2::current_err;
+ }
+@@ -301,12 +308,12 @@ fapi_try_exit:
+ /// @note decodes the attribute "encoding" to get the vddr and vddr/vpp power curves for a dimm
+ ///
+ fapi2::ReturnCode get_power_attrs (const fapi2::Target<fapi2::TARGET_TYPE_MCS>& i_mcs,
+-                                   const std::vector< fapi2::buffer< uint64_t > >& i_slope,
+-                                   const std::vector< fapi2::buffer< uint64_t > >& i_intercept,
+-                                   const std::vector< fapi2::buffer< uint64_t > >& i_thermal_power_limit,
++                                   const std::vector< uint64_t >& i_slope,
++                                   const std::vector< uint64_t >& i_intercept,
++                                   const std::vector< uint64_t >& i_thermal_power_limit,
+                                    uint16_t o_vddr_slope [PORTS_PER_MCS][MAX_DIMM_PER_PORT],
+                                    uint16_t o_vddr_int [PORTS_PER_MCS][MAX_DIMM_PER_PORT],
+-                                   uint16_t o_total_slope[PORTS_PER_MCS][MAX_DIMM_PER_PORT],
++                                   uint16_t o_total_slope [PORTS_PER_MCS][MAX_DIMM_PER_PORT],
+                                    uint16_t o_total_int [PORTS_PER_MCS][MAX_DIMM_PER_PORT],
+                                    uint32_t o_thermal_power [PORTS_PER_MCS][MAX_DIMM_PER_PORT])
+ {
+diff --git a/src/import/chips/p9/procedures/hwp/memory/lib/power_thermal/decoder.H b/src/import/chips/p9/procedures/hwp/memory/lib/power_thermal/decoder.H
+index a0de4e1..f3f9c2c 100644
+--- a/src/import/chips/p9/procedures/hwp/memory/lib/power_thermal/decoder.H
++++ b/src/import/chips/p9/procedures/hwp/memory/lib/power_thermal/decoder.H
+@@ -234,7 +234,7 @@ class decoder
+         /// @return fapi2::ReturnCode FAPI2_RC_SUCCESS iff the encoding was successful
+         /// @note populates iv_vddr_slope, iv_total_slope
+         ///
+-        fapi2::ReturnCode find_slope (const std::vector<fapi2::buffer<uint64_t>>& i_slope);
++        fapi2::ReturnCode find_slope (const std::vector<uint64_t>& i_slope);
+ 
+         ///
+         /// @brief Finds a value for power curve intercept attributes by matching the generated hashes
+@@ -242,7 +242,7 @@ class decoder
+         /// @return fapi2::ReturnCode FAPI2_RC_SUCCESS iff the encoding was successful
+         /// @note populates iv_vddr_intercept, iv_total_intercept
+         ///
+-        fapi2::ReturnCode find_intercept (const std::vector<fapi2::buffer<uint64_t>>& i_intercept);
++        fapi2::ReturnCode find_intercept (const std::vector<uint64_t>& i_intercept);
+ 
+         ///
+         /// @brief Finds a value from ATTR_MSS_MRW_THERMAL_MEMORY_POWER_LIMIT and stores in iv variable
+@@ -250,7 +250,7 @@ class decoder
+         /// @return fapi2::ReturnCode FAPI2_RC_SUCCESS iff the encoding was successful
+         /// @note populates iv_thermal_power_limit
+         ///
+-        fapi2::ReturnCode find_thermal_power_limit (const std::vector<fapi2::buffer<uint64_t>>& i_thermal_limits);
++        fapi2::ReturnCode find_thermal_power_limit (const std::vector<uint64_t>& i_thermal_limits);
+ 
+ };
+ 
+@@ -270,9 +270,9 @@ class decoder
+ /// @note decodes the attribute "encoding" to get the vddr and vddr/vpp power curves for a dimm
+ ///
+ fapi2::ReturnCode get_power_attrs (const fapi2::Target<fapi2::TARGET_TYPE_MCS>& i_targets,
+-                                   const std::vector< fapi2::buffer< uint64_t > >& i_slope,
+-                                   const std::vector< fapi2::buffer< uint64_t > >& i_intercept,
+-                                   const std::vector< fapi2::buffer< uint64_t > >& i_thermal_power_limit,
++                                   const std::vector< uint64_t >& i_slope,
++                                   const std::vector< uint64_t >& i_intercept,
++                                   const std::vector< uint64_t >& i_thermal_power_limit,
+                                    uint16_t o_vddr_slope       [PORTS_PER_MCS][MAX_DIMM_PER_PORT],
+                                    uint16_t o_vddr_int         [PORTS_PER_MCS][MAX_DIMM_PER_PORT],
+                                    uint16_t o_total_slope      [PORTS_PER_MCS][MAX_DIMM_PER_PORT],
+diff --git a/src/import/chips/p9/procedures/hwp/memory/p9_mss_eff_config_thermal.C b/src/import/chips/p9/procedures/hwp/memory/p9_mss_eff_config_thermal.C
+index 0d99ab4..bc1fa57 100644
+--- a/src/import/chips/p9/procedures/hwp/memory/p9_mss_eff_config_thermal.C
++++ b/src/import/chips/p9/procedures/hwp/memory/p9_mss_eff_config_thermal.C
+@@ -52,65 +52,25 @@ extern "C"
+     /// @note sets ATTR_MSS_MEM_WATT_TARGET, ATTR_MSS_RUNTIME_MEM_THROTTLED_N_COMMANDS_PER_PORT and _PER_SLOT, and ATTR_MSS_PORT_MAXPOWER
+     fapi2::ReturnCode p9_mss_eff_config_thermal( const std::vector< fapi2::Target<fapi2::TARGET_TYPE_MCS> >& i_targets )
+     {
+-
+         FAPI_INF("Start effective config thermal");
++        fapi2::ReturnCode l_rc;
++
++        std::vector< uint64_t > l_slope (mss::power_thermal::SIZE_OF_POWER_CURVES_ATTRS, 0);
++        std::vector< uint64_t > l_intercept (mss::power_thermal::SIZE_OF_POWER_CURVES_ATTRS, 0);
++        std::vector< uint64_t > l_thermal_power_limit (mss::power_thermal::SIZE_OF_THERMAL_ATTR, 0);
+ 
+         uint16_t l_vddr_slope     [mss::PORTS_PER_MCS][mss::MAX_DIMM_PER_PORT] = {};
+         uint16_t l_vddr_int       [mss::PORTS_PER_MCS][mss::MAX_DIMM_PER_PORT] = {};
+         uint16_t l_total_slope    [mss::PORTS_PER_MCS][mss::MAX_DIMM_PER_PORT] = {};
+         uint16_t l_total_int      [mss::PORTS_PER_MCS][mss::MAX_DIMM_PER_PORT] = {};
+         uint32_t l_thermal_power  [mss::PORTS_PER_MCS][mss::MAX_DIMM_PER_PORT] = {};
+-        fapi2::ReturnCode l_rc;
+-
+-        //Gotta convert into fapi2::buffers. Not very elegant
+-        //Do it here or in the encode and decode functions
+-        //Not that pretty :(
+-        std::vector< uint64_t > l_tslope (mss::power_thermal::SIZE_OF_POWER_CURVES_ATTRS, 0);
+-        std::vector< uint64_t > l_tintercept (mss::power_thermal::SIZE_OF_POWER_CURVES_ATTRS, 0);
+-        std::vector< uint64_t > l_tthermal_power_limit (mss::power_thermal::SIZE_OF_THERMAL_ATTR, 0);
+-
+-        std::vector<fapi2::buffer< uint64_t>> l_slope = {};
+-        std::vector<fapi2::buffer< uint64_t>> l_intercept = {};
+-        std::vector<fapi2::buffer< uint64_t>> l_thermal_power_limit = {};
+-
+-        //Get the vectors of power curves and thermal power limits to convert to buffers
+-        FAPI_TRY( mss::mrw_pwr_slope (l_tslope.data()), "Error in p9_mss_eff_config_thermal");
+-        FAPI_TRY( mss::mrw_pwr_intercept (l_tintercept.data()), "Error in p9_mss_eff_config_thermal" );
+-        FAPI_TRY( mss::mrw_thermal_memory_power_limit (l_tthermal_power_limit.data()), "Error in p9_mss_eff_config_thermal" );
+-        FAPI_TRY( mss::power_thermal::set_runtime_m_and_watt_limit(i_targets), "Error in p9_mss_eff_config_thermal");
+-
+-        for (size_t i = 0; i < mss::power_thermal::SIZE_OF_POWER_CURVES_ATTRS; ++i)
+-        {
+-            for (const auto l_cur : l_tslope)
+-            {
+-                fapi2::buffer<uint64_t> l_slope_buf = l_cur;
+-
+-                if (l_slope_buf != 0)
+-                {
+-                    l_slope.push_back(l_slope_buf);
+-                }
+-            }
+-
+-            for (auto l_cur : l_tintercept)
+-            {
+-                fapi2::buffer<uint64_t> l_intercept_buf = l_cur;
+ 
+-                if (l_intercept_buf != 0)
+-                {
+-                    l_intercept.push_back(l_intercept_buf);
+-                }
+-            }
++        FAPI_TRY( mss::mrw_pwr_slope (l_slope.data()), "Error in p9_mss_eff_config_thermal");
++        FAPI_TRY( mss::mrw_pwr_intercept (l_intercept.data()), "Error in p9_mss_eff_config_thermal" );
++        FAPI_TRY( mss::mrw_thermal_memory_power_limit (l_thermal_power_limit.data()), "Error in p9_mss_eff_config_thermal" );
++        FAPI_TRY( mss::power_thermal::set_runtime_m_and_watt_limit (i_targets), "Error in p9_mss_eff_config_thermal");
+ 
+-            for (auto l_cur : l_tthermal_power_limit)
+-            {
+-                fapi2::buffer<uint64_t> l_tthermal_buf = l_cur;
+-
+-                if (l_tthermal_buf != 0)
+-                {
+-                    l_thermal_power_limit.push_back(l_tthermal_buf);
+-                }
+-            }
+-        }
++        FAPI_INF("Size of vectors are %d %d %d", l_slope.size(), l_intercept.size(), l_thermal_power_limit.size());
+ 
+         //Restore runtime_throttles from safemode setting
+         //Decode and set power curve attributes at the same time
+@@ -119,6 +79,7 @@ extern "C"
+             //Not doing any work if there are no dimms installed
+             if (mss::count_dimm(l_mcs) == 0)
+             {
++                FAPI_INF("Skipping eff_config thermal because no dimms %s", mss::c_str(l_mcs));
+                 continue;
+             }
+ 
+@@ -131,6 +92,7 @@ extern "C"
+                       l_total_slope,
+                       l_total_int,
+                       l_thermal_power));
++
+             //Sets throttles to max_databus_util value
+             FAPI_INF("Restoring throttles");
+             FAPI_TRY( mss::power_thermal::restore_runtime_throttles(l_mcs), "Error in p9_mss_eff_config_thermal");
+@@ -169,6 +131,14 @@ extern "C"
+                 continue;
+             }
+ 
++
++            //Zero out the arrays
++            memset(l_vddr_slope, 0, sizeof(l_vddr_slope));
++            memset(l_vddr_int, 0, sizeof(l_vddr_int));
++            memset(l_total_slope, 0, sizeof(l_total_slope));
++            memset(l_total_int, 0, sizeof(l_total_int));
++            memset(l_thermal_power, 0, sizeof(l_thermal_power));
++
+             FAPI_TRY( mss::power_thermal::get_power_attrs(l_mcs,
+                       l_slope,
+                       l_intercept,
+-- 
+2.9.2.windows.1
+
