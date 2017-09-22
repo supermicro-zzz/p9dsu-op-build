@@ -1,0 +1,57 @@
+From 50fad3d3c172bdd7f2b3882159b4c89ac9c00bf1 Mon Sep 17 00:00:00 2001
+From: Jacob Harvey <jlharvey@us.ibm.com>
+Date: Tue, 19 Sep 2017 14:14:56 -0500
+Subject: [PATCH] Change training advance check
+
+    Change the check to check for fails that exceed ECC
+    This will handle the DDR_PHY fir popping on every training
+
+Change-Id: Ifff4c542c620846954acbc0d9d909053233fb2e7
+Reviewed-on: http://ralgit01.raleigh.ibm.com/gerrit1/46447
+Tested-by: FSP CI Jenkins <fsp-CI-jenkins+hostboot@us.ibm.com>
+Dev-Ready: JACOB L. HARVEY <jlharvey@us.ibm.com>
+Tested-by: Jenkins Server <pfd-jenkins+hostboot@us.ibm.com>
+Tested-by: Hostboot CI <hostboot-ci+hostboot@us.ibm.com>
+Reviewed-by: Louis Stermole <stermole@us.ibm.com>
+Reviewed-by: ANDRE A. MARIN <aamarin@us.ibm.com>
+Reviewed-by: Jennifer A. Stofer <stofer@us.ibm.com>
+---
+ .../p9/procedures/hwp/memory/p9_mss_draminit_training_adv.C    | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/src/import/chips/p9/procedures/hwp/memory/p9_mss_draminit_training_adv.C b/src/import/chips/p9/procedures/hwp/memory/p9_mss_draminit_training_adv.C
+index cb431f5..b78f6e9 100644
+--- a/src/import/chips/p9/procedures/hwp/memory/p9_mss_draminit_training_adv.C
++++ b/src/import/chips/p9/procedures/hwp/memory/p9_mss_draminit_training_adv.C
+@@ -129,12 +129,15 @@ extern "C"
+             {
+                 bool l_cal_fail = false;
+ 
++                // l_fails is used to see if we need to rerun training.
++                // The other vector, l_fails, will be used to store errors across all of the ports
+                 std::vector<fapi2::ReturnCode> l_temp_fails;
++
+                 FAPI_TRY( mss::setup_and_execute_cal(p, rp, l_cal_steps_enabled, l_cal_abort_on_error) );
+                 FAPI_TRY( mss::find_and_log_cal_errors(p, rp, l_cal_abort_on_error, l_cal_fail, l_temp_fails) );
+ 
+                 // If we got a fail, let's ignore the previous fails and run backup pattern
+-                if (l_cal_fail)
++                if (l_temp_fails.size() != 0)
+                 {
+                     l_cal_fail = false;
+ 
+@@ -158,8 +161,9 @@ extern "C"
+                     FAPI_TRY( mss::setup_and_execute_cal(p, rp, l_cal_steps_enabled, l_cal_abort_on_error) );
+                     FAPI_TRY( mss::find_and_log_cal_errors(p, rp, l_cal_abort_on_error, l_cal_fail, l_fails) );
+ 
+-                    // If l_cal_fail == true here, error out
+-                    if (l_cal_fail)
++                    // Fail out for now.
++                    // TK should restore values here
++                    if (l_fails.size() != 0)
+                     {
+                         fapi2::Target<fapi2::TARGET_TYPE_DIMM> l_dimm;
+ 
+-- 
+2.9.2.windows.1
+
