@@ -1,0 +1,37 @@
+From 20ec61aad508bbab6e29eea9b639d27211fb7a01 Mon Sep 17 00:00:00 2001
+From: Zane Shelley <zshelle@us.ibm.com>
+Date: Sat, 21 Oct 2017 15:17:47 -0500
+Subject: [PATCH 4/4] PRD: unit checkstops on NPUFIRs set to checkstop root
+ cause
+
+Change-Id: Iab6f15335617501301ecb1b1eb991e46e198e596
+CQ: SW404939
+---
+ src/usr/diag/prdf/common/plat/p9/p9_nimbus.rule | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/usr/diag/prdf/common/plat/p9/p9_nimbus.rule b/src/usr/diag/prdf/common/plat/p9/p9_nimbus.rule
+index f96134e..b195f8b 100644
+--- a/src/usr/diag/prdf/common/plat/p9/p9_nimbus.rule
++++ b/src/usr/diag/prdf/common/plat/p9/p9_nimbus.rule
+@@ -7312,7 +7312,7 @@ rule rNPU0FIR
+     NPU0FIR & ~NPU0FIR_MASK &  NPU0FIR_ACT0 &  NPU0FIR_ACT1;
+ };
+ 
+-group gNPU0FIR filter singlebit, cs_root_cause
++group gNPU0FIR filter singlebit, cs_root_cause( 1, 2, 3, 4, 5, 6, 7, 9, 10, 16, 18, 19, 25, 29, 31, 40, 42, 44, 45, 46 )
+ {
+     /** NPU0FIR[0]
+      *  NTL array CE
+@@ -7585,7 +7585,7 @@ rule rNPU1FIR
+     NPU1FIR & ~NPU1FIR_MASK &  NPU1FIR_ACT0 &  NPU1FIR_ACT1;
+ };
+ 
+-group gNPU1FIR filter singlebit, cs_root_cause
++group gNPU1FIR filter singlebit, cs_root_cause( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 20, 22, 25, 27, 28, 29, 31, 32, 33, 34, 35 )
+ {
+     /** NPU1FIR[0]
+      *  NDL Brick0 stall
+-- 
+2.9.2.windows.1
+
