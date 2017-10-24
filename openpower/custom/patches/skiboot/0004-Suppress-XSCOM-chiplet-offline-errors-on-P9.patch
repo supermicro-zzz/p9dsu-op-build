@@ -1,0 +1,72 @@
+From patchwork Mon Oct 23 21:58:22 2017
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Suppress XSCOM chiplet-offline errors on P9
+X-Patchwork-Submitter: Stewart Smith <stewart@linux.vnet.ibm.com>
+X-Patchwork-Id: 829699
+Message-Id: <20171023215822.4671-1-stewart@linux.vnet.ibm.com>
+To: skiboot@lists.ozlabs.org
+Cc: dcrowell@us.ibm.com
+Date: Mon, 23 Oct 2017 16:58:22 -0500
+From: Stewart Smith <stewart@linux.vnet.ibm.com>
+List-Id: Mailing list for skiboot development <skiboot.lists.ozlabs.org>
+
+Workaround on P9: PRD does operations it *knows* will fail with this
+error to work around a hardware issue where accesses via the PIB
+(FSI or OCC) work as expected, accesses via the ADU (what xscom goes
+through) do not. The chip logic will always return all FFs if there
+is any error on the scom.
+
+Suggested-by: Daniel M Crowell <dcrowell@us.ibm.com>
+Signed-off-by: Stewart Smith <stewart@linux.vnet.ibm.com>
+---
+ hw/xscom.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/hw/xscom.c b/hw/xscom.c
+index 716cb73675fc..5b3bd8895210 100644
+--- a/hw/xscom.c
++++ b/hw/xscom.c
+@@ -1,4 +1,4 @@
+-/* Copyright 2013-2014 IBM Corp.
++/* Copyright 2013-2017 IBM Corp.
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+@@ -284,6 +284,16 @@ static int __xscom_read(uint32_t gcid, uint32_t pcb_addr, uint64_t *val)
+ 	if (xscom_is_multicast_addr(pcb_addr) && ret == OPAL_XSCOM_CHIPLET_OFF)
+ 		return ret;
+ 
++	/*
++	 * Workaround on P9: PRD does operations it *knows* will fail with this
++	 * error to work around a hardware issue where accesses via the PIB
++	 * (FSI or OCC) work as expected, accesses via the ADU (what xscom goes
++	 * through) do not. The chip logic will always return all FFs if there
++	 * is any error on the scom.
++	 */
++	if (proc_gen == proc_gen_p9 && ret == OPAL_XSCOM_CHIPLET_OFF)
++		return ret;
++
+ 	prerror("XSCOM: Read failed, ret =  %lld\n", ret);
+ 	return ret;
+ }
+@@ -324,6 +334,16 @@ static int __xscom_write(uint32_t gcid, uint32_t pcb_addr, uint64_t val)
+ 	if (xscom_is_multicast_addr(pcb_addr) && ret == OPAL_XSCOM_CHIPLET_OFF)
+ 		return ret;
+ 
++	/*
++	 * Workaround on P9: PRD does operations it *knows* will fail with this
++	 * error to work around a hardware issue where accesses via the PIB
++	 * (FSI or OCC) work as expected, accesses via the ADU (what xscom goes
++	 * through) do not. The chip logic will always return all FFs if there
++	 * is any error on the scom.
++	 */
++	if (proc_gen == proc_gen_p9 && ret == OPAL_XSCOM_CHIPLET_OFF)
++		return ret;
++
+ 	prerror("XSCOM: Write failed, ret =  %lld\n", ret);
+ 	return ret;
+ }
+-- 
+2.9.2.windows.1
