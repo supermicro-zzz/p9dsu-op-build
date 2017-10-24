@@ -1,16 +1,7 @@
-From patchwork Mon Oct 23 21:58:22 2017
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Suppress XSCOM chiplet-offline errors on P9
-X-Patchwork-Submitter: Stewart Smith <stewart@linux.vnet.ibm.com>
-X-Patchwork-Id: 829699
-Message-Id: <20171023215822.4671-1-stewart@linux.vnet.ibm.com>
-To: skiboot@lists.ozlabs.org
-Cc: dcrowell@us.ibm.com
-Date: Mon, 23 Oct 2017 16:58:22 -0500
+From 95e6cae73f2dd6957d327a08fb3d0e0f2269ec89 Mon Sep 17 00:00:00 2001
 From: Stewart Smith <stewart@linux.vnet.ibm.com>
-List-Id: Mailing list for skiboot development <skiboot.lists.ozlabs.org>
+Date: Mon, 23 Oct 2017 16:58:22 -0500
+Subject: [PATCH] Suppress XSCOM chiplet-offline errors on P9
 
 Workaround on P9: PRD does operations it *knows* will fail with this
 error to work around a hardware issue where accesses via the PIB
@@ -25,7 +16,7 @@ Signed-off-by: Stewart Smith <stewart@linux.vnet.ibm.com>
  1 file changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/hw/xscom.c b/hw/xscom.c
-index 716cb73675fc..5b3bd8895210 100644
+index 716cb73..5b3bd88 100644
 --- a/hw/xscom.c
 +++ b/hw/xscom.c
 @@ -1,4 +1,4 @@
@@ -70,3 +61,4 @@ index 716cb73675fc..5b3bd8895210 100644
  }
 -- 
 2.9.2.windows.1
+
