@@ -1,7 +1,7 @@
-From 20ec61aad508bbab6e29eea9b639d27211fb7a01 Mon Sep 17 00:00:00 2001
+From 517964edae11f927fb6e54882f794fda81ec2678 Mon Sep 17 00:00:00 2001
 From: Zane Shelley <zshelle@us.ibm.com>
 Date: Sat, 21 Oct 2017 15:17:47 -0500
-Subject: [PATCH 4/4] PRD: unit checkstops on NPUFIRs set to checkstop root
+Subject: [PATCH 3/5] PRD: unit checkstops on NPUFIRs set to checkstop root
  cause
 
 Change-Id: Iab6f15335617501301ecb1b1eb991e46e198e596

@@ -1,0 +1,43 @@
+From 0289fba51b6b1551db1b923da42ff118d5aff53a Mon Sep 17 00:00:00 2001
+From: Dean Sanner <dsanner@us.ibm.com>
+Date: Sat, 21 Oct 2017 22:05:10 -0500
+Subject: [PATCH 5/5] Fix PNOR sections loaded into reserve-mem for non secure
+ sys
+
+Prevent the header page from being loaded into HB reserved memory
+for unsigned PNOR sections with a header.
+
+Change-Id: I0fe80edc1a171b3e3066348cbf64205041082e2b
+---
+ src/usr/util/runtime/utillidmgr_rt.C | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
+
+diff --git a/src/usr/util/runtime/utillidmgr_rt.C b/src/usr/util/runtime/utillidmgr_rt.C
+index f1cc860..39603f4 100644
+--- a/src/usr/util/runtime/utillidmgr_rt.C
++++ b/src/usr/util/runtime/utillidmgr_rt.C
+@@ -171,17 +171,11 @@ errlHndl_t UtilLidMgr::loadLid()
+                 else
+                 {
+                     // If no secure header, just use PNOR size
++                    // NOTE: Unsigned sections with sha512Version have already
++                    //       skipped over the header and decreased size while
++                    //       parsing the PNOR TOC
+                     iv_lidSize = iv_lidPnorInfo.size;
+-
+-                    // Need to increment past header if one exists
+-                    if (iv_lidPnorInfo.sha512Version)
+-                    {
+-                        UTIL_FT("UtilLidMgr::loadLid - resv mem section is not secure, but has header");
+-                        // Increment by page size to not expose sha512 version header
+-                        iv_lidBuffer = static_cast<uint8_t*>(iv_lidBuffer) +
+-                                       PAGESIZE;
+-                        iv_lidSize -= PAGESIZE;
+-                    }
++                    UTIL_FT("UtilLidMgr::loadLid - iv_lidSize=%d", iv_lidSize );
+                 }
+             }
+         }
+-- 
+2.9.2.windows.1
+

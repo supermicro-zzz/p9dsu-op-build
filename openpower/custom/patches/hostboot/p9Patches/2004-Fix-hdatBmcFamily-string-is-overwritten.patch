@@ -1,7 +1,7 @@
-From 21aab32ba295a3dd5bea3b82c588807c63e70c53 Mon Sep 17 00:00:00 2001
+From 2882e19f9ac370076d0c1d03654dbdb2cdbe5e75 Mon Sep 17 00:00:00 2001
 From: Jim Yuan <jim.yuan@supermicro.com>
 Date: Wed, 18 Oct 2017 11:38:08 -0700
-Subject: [PATCH] Fix hdatBmcFamily string is overwritten.
+Subject: [PATCH 4/5] Fix hdatBmcFamily string is overwritten.
 
 Resolves #119
 
