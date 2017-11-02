@@ -1,0 +1,135 @@
+From 6932d86c0362942296094b86ff17b8334f1ca3fd Mon Sep 17 00:00:00 2001
+From: Nick Klazynski <jklazyns@us.ibm.com>
+Date: Mon, 30 Oct 2017 14:13:22 -0500
+Subject: [PATCH 1/5] Add HW425526 and HW425027
+
+dis_tracker_merge does not matter since dis_tracker is now
+enabled everywhere, so I removed it.
+
+Change-Id: I9eb2871eec16f167c9f7514dcb84e057e0196f90
+Reviewed-on: http://ralgit01.raleigh.ibm.com/gerrit1/49003
+Tested-by: Jenkins Server <pfd-jenkins+hostboot@us.ibm.com>
+Tested-by: HWSV CI <hwsv-ci+hostboot@us.ibm.com>
+Reviewed-by: Joseph J. McGill <jmcgill@us.ibm.com>
+Reviewed-by: Jenny Huynh <jhuynh@us.ibm.com>
+Tested-by: PPE CI <ppe-ci+hostboot@us.ibm.com>
+Tested-by: Hostboot CI <hostboot-ci+hostboot@us.ibm.com>
+Tested-by: FSP CI Jenkins <fsp-CI-jenkins+hostboot@us.ibm.com>
+Reviewed-by: Thi N. Tran <thi@us.ibm.com>
+Dev-Ready: James N. Klazynski <jklazyns@us.ibm.com>
+Reviewed-by: Jennifer A. Stofer <stofer@us.ibm.com>
+---
+ .../xml/attribute_info/chip_ec_attributes.xml      | 63 +++++++---------------
+ 1 file changed, 20 insertions(+), 43 deletions(-)
+
+diff --git a/src/import/chips/p9/procedures/xml/attribute_info/chip_ec_attributes.xml b/src/import/chips/p9/procedures/xml/attribute_info/chip_ec_attributes.xml
+index a7bed81..49a9404 100644
+--- a/src/import/chips/p9/procedures/xml/attribute_info/chip_ec_attributes.xml
++++ b/src/import/chips/p9/procedures/xml/attribute_info/chip_ec_attributes.xml
+@@ -672,17 +672,19 @@
+   </attribute>
+   <!-- ******************************************************************** -->
+   <attribute>
+-    <id>ATTR_CHIP_EC_FEATURE_HW416227</id>
++    <id>ATTR_CHIP_EC_FEATURE_EMQ_DIS_TRACKER</id>
+     <targetType>TARGET_TYPE_PROC_CHIP, TARGET_TYPE_PROC_CHIP</targetType>
+     <description>
+-      Nimbus DD2.0, Cumulus DD1.0: HW416227 - Disable Tracker
++      Nimbus DD1.0: HW393929 / HW394578
++      Nimbus DD2.0 / Cumulus DD1.0: HW416227
++      Nimbus DD2.1 / Nimbus DD2.2: HW425027
+     </description>
+     <chipEcFeature>
+       <chip>
+         <name>ENUM_ATTR_NAME_NIMBUS</name>
+         <ec>
+-          <value>0x20</value>
+-          <test>EQUAL</test>
++          <value>0x22</value>
++          <test>LESS_THAN_OR_EQUAL</test>
+         </ec>
+       </chip>
+       <chip>
+@@ -696,17 +698,26 @@
+   </attribute>
+   <!-- ******************************************************************** -->
+   <attribute>
+-    <id>ATTR_CHIP_EC_FEATURE_HW393929_HW394578</id>
+-    <targetType>TARGET_TYPE_PROC_CHIP</targetType>
++    <id>ATTR_CHIP_EC_FEATURE_HW425526</id>
++    <targetType>TARGET_TYPE_PROC_CHIP, TARGET_TYPE_PROC_CHIP</targetType>
+     <description>
+-      Nimbus DD1 only: HW393929 / HW394578
++      HW425526 - Force H-Bit in the TLB
++      Nimbus DD1.0 / DD2.0 / DD2.1 / DD2.2
++      Cumulus DD1.0
+     </description>
+     <chipEcFeature>
+       <chip>
+         <name>ENUM_ATTR_NAME_NIMBUS</name>
+         <ec>
+-          <value>0x20</value>
+-          <test>LESS_THAN</test>
++          <value>0x22</value>
++          <test>LESS_THAN_OR_EQUAL</test>
++        </ec>
++      </chip>
++      <chip>
++        <name>ENUM_ATTR_NAME_CUMULUS</name>
++        <ec>
++          <value>0x10</value>
++          <test>EQUAL</test>
+         </ec>
+       </chip>
+     </chipEcFeature>
+@@ -2563,23 +2574,6 @@
+   </attribute>
+   <!-- ******************************************************************** -->
+   <attribute>
+-    <id>ATTR_CHIP_EC_FEATURE_HW398269</id>
+-    <targetType>TARGET_TYPE_PROC_CHIP</targetType>
+-    <description>
+-      Nimbus DD1: Reckless Carpenter
+-    </description>
+-    <chipEcFeature>
+-      <chip>
+-        <name>ENUM_ATTR_NAME_NIMBUS</name>
+-        <ec>
+-          <value>0x20</value>
+-          <test>LESS_THAN</test>
+-        </ec>
+-      </chip>
+-    </chipEcFeature>
+-  </attribute>
+-  <!-- ******************************************************************** -->
+-  <attribute>
+     <id>ATTR_CHIP_EC_FEATURE_HW399765</id>
+     <targetType>TARGET_TYPE_PROC_CHIP</targetType>
+     <description>
+@@ -2910,23 +2904,6 @@
+   </attribute>
+   <!-- ******************************************************************** -->
+   <attribute>
+-    <id>ATTR_CHIP_EC_FEATURE_HW408628</id>>
+-    <targetType>TARGET_TYPE_PROC_CHIP</targetType>
+-    <description>
+-      HW408628
+-    </description>
+-    <chipEcFeature>
+-      <chip>
+-        <name>ENUM_ATTR_NAME_NIMBUS</name>
+-        <ec>
+-          <value>0x20</value>
+-          <test>GREATER_THAN_OR_EQUAL</test>
+-        </ec>
+-      </chip>
+-    </chipEcFeature>
+-  </attribute>
+-  <!-- ******************************************************************** -->
+-  <attribute>
+     <id>ATTR_CHIP_EC_FEATURE_HW408876</id>>
+     <targetType>TARGET_TYPE_PROC_CHIP, TARGET_TYPE_PROC_CHIP</targetType>
+     <description>
+-- 
+2.9.2.windows.1
+

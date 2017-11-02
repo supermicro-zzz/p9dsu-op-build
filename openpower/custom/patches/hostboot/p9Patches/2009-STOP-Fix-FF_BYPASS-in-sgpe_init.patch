@@ -1,0 +1,59 @@
+From 11f2633b020aa60583fade7a422dd701a8f6f8e7 Mon Sep 17 00:00:00 2001
+From: Yue Du <daviddu@us.ibm.com>
+Date: Fri, 27 Oct 2017 21:20:04 -0500
+Subject: [PATCH 3/5] STOP: Fix FF_BYPASS in sgpe_init
+
+Change-Id: I71acf1cabb8039ff319ca6a1f64d6205057972e4
+CQ: SW406589
+Reviewed-on: http://ralgit01.raleigh.ibm.com/gerrit1/48965
+Tested-by: Jenkins Server <pfd-jenkins+hostboot@us.ibm.com>
+Tested-by: Hostboot CI <hostboot-ci+hostboot@us.ibm.com>
+Tested-by: FSP CI Jenkins <fsp-CI-jenkins+hostboot@us.ibm.com>
+Reviewed-by: Michael S. Floyd <mfloyd@us.ibm.com>
+Reviewed-by: Juan R. Medina <jrmedina@us.ibm.com>
+Reviewed-by: Gregory S. Still <stillgs@us.ibm.com>
+Reviewed-on: http://ralgit01.raleigh.ibm.com/gerrit1/48966
+Reviewed-by: Hostboot Team <hostboot@us.ibm.com>
+Tested-by: Jenkins OP Build CI <op-jenkins+hostboot@us.ibm.com>
+Tested-by: Jenkins OP HW <op-hw-jenkins+hostboot@us.ibm.com>
+Reviewed-by: William G. Hoffa <wghoffa@us.ibm.com>
+---
+ .../p9/procedures/hwp/pm/p9_pm_stop_gpe_init.C     | 22 ----------------------
+ 1 file changed, 22 deletions(-)
+
+diff --git a/src/import/chips/p9/procedures/hwp/pm/p9_pm_stop_gpe_init.C b/src/import/chips/p9/procedures/hwp/pm/p9_pm_stop_gpe_init.C
+index f62ccb9..a04a607 100644
+--- a/src/import/chips/p9/procedures/hwp/pm/p9_pm_stop_gpe_init.C
++++ b/src/import/chips/p9/procedures/hwp/pm/p9_pm_stop_gpe_init.C
+@@ -266,28 +266,6 @@ fapi2::ReturnCode p9_pm_stop_gpe_init(
+                     .set_MODE(p9pm::PM_RESET),
+                     "PBA setup failed");
+ 
+-        // Initialize DPLL Mode and Slew Rate (Done once for runtime STOPs)
+-        // Hostboot Master is done in istep4 hwp prior to this
+-        uint8_t                 l_quad_number = 0;
+-        fapi2::buffer<uint64_t> l_data64      = 0;
+-
+-        auto l_functional_quad_vector =
+-            i_target.getChildren<fapi2::TARGET_TYPE_EQ>
+-            (fapi2::TARGET_STATE_FUNCTIONAL);
+-
+-        for(auto l_chplt_trgt : l_functional_quad_vector)
+-        {
+-            FAPI_TRY(FAPI_ATTR_GET(fapi2::ATTR_CHIP_UNIT_POS,
+-                                   l_chplt_trgt,
+-                                   l_quad_number),
+-                     "ERROR: Failed to get the position of the QUAD:0x%08X",
+-                     l_chplt_trgt);
+-            FAPI_DBG("QUAD number = %d", l_quad_number);
+-            l_data64.flush<0>().setBit<2>().insertFromRight<6, 10>(0x01);
+-            FAPI_TRY(putScom(l_chplt_trgt, EQ_QPPM_DPLL_CTRL_OR, l_data64),
+-                     "ERROR: Failed to assert DPLL in mode 1 and set slew rate to 1");
+-        }
+-
+         uint8_t l_ivrm_attrval = 0;
+         uint8_t l_vdm_attrval = 0;
+ 
+-- 
+2.9.2.windows.1
+
