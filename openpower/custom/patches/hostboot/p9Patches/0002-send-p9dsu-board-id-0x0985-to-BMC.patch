@@ -1,7 +1,7 @@
-From ff21c186b6930086626b990797a0e6f28c27419c Mon Sep 17 00:00:00 2001
+From a39a5c355148ad4c720db58f22dceeb0d1c52a1e Mon Sep 17 00:00:00 2001
 From: jim <jim.yuan@supermicro.com>
 Date: Tue, 18 Apr 2017 10:49:09 -0700
-Subject: [PATCH 2/5] send p9dsu board id 0x0985 to BMC.
+Subject: [PATCH 2/4] send p9dsu board id 0x0985 to BMC.
 
 ---
  src/include/usr/ipmi/ipmiif.H                      |  6 ++++-
@@ -41,7 +41,7 @@ index b652750..e943e8b 100644
  
  #endif
 diff --git a/src/usr/initservice/istepdispatcher/istepdispatcher.C b/src/usr/initservice/istepdispatcher/istepdispatcher.C
-index 8d33084..99a4207 100644
+index a6ebbd4..80a970c 100644
 --- a/src/usr/initservice/istepdispatcher/istepdispatcher.C
 +++ b/src/usr/initservice/istepdispatcher/istepdispatcher.C
 @@ -287,6 +287,17 @@ void IStepDispatcher::init(errlHndl_t &io_rtaskRetErrl)

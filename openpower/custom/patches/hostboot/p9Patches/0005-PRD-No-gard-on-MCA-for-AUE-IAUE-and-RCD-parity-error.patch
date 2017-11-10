@@ -1,0 +1,85 @@
+From c6d37e2df7b0d06c5fdaf68cdb925af831fa9755 Mon Sep 17 00:00:00 2001
+From: Zane Shelley <zshelle@us.ibm.com>
+Date: Mon, 6 Nov 2017 14:05:45 -0600
+Subject: [PATCH] PRD: No gard on MCA for AUE/IAUE and RCD parity errors
+
+Change-Id: Ie1eefcdac8b3137e0fee7eb3b58b6c5b1555cddc
+CQ: SW407092
+CQ: SW407550
+Backport: release-op910
+Reviewed-on: http://ralgit01.raleigh.ibm.com/gerrit1/49311
+Tested-by: Jenkins Server <pfd-jenkins+hostboot@us.ibm.com>
+Reviewed-by: Caleb N. Palmer <cnpalmer@us.ibm.com>
+Reviewed-by: Brian J. Stegmiller <bjs@us.ibm.com>
+Reviewed-by: Zane C. Shelley <zshelle@us.ibm.com>
+Squashed: I170d2047ac911107787ff77bc1bde2bf5a14e0eb
+---
+ src/usr/diag/prdf/common/plat/p9/p9_mca_actions.rule         | 10 +++++-----
+ src/usr/diag/prdf/common/plat/p9/p9_proc_common_actions.rule |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/usr/diag/prdf/common/plat/p9/p9_mca_actions.rule b/src/usr/diag/prdf/common/plat/p9/p9_mca_actions.rule
+index 60c3879..51abf93 100644
+--- a/src/usr/diag/prdf/common/plat/p9/p9_mca_actions.rule
++++ b/src/usr/diag/prdf/common/plat/p9/p9_mca_actions.rule
+@@ -52,7 +52,7 @@ actionclass mem_port_failure_UERE
+     SueSource;
+     callout(connected(TYPE_DIMM,0), MRU_HIGH); # DIMM 0 HIGH
+     callout(connected(TYPE_DIMM,1), MRU_HIGH); # DIMM 1 HIGH
+-    calloutSelfLow;                            # Self LOW
++    calloutSelfLowNoGard;                      # Self LOW
+     threshold1;                                # Threshold 1
+     funccall("MemPortFailure");                # Mask off the entire port
+ };
+@@ -62,7 +62,7 @@ actionclass rcd_parity_error
+ {
+     callout(connected(TYPE_DIMM,0), MRU_HIGH); # DIMM 0 HIGH
+     callout(connected(TYPE_DIMM,1), MRU_HIGH); # DIMM 1 HIGH
+-    calloutSelfLow;                            # Self LOW
++    calloutSelfLowNoGard;                      # Self LOW
+     # Thresholding done in plugin
+     funccall("RcdParityError");                # Run TPS on TH for all MCA ranks
+ };
+@@ -97,7 +97,7 @@ actionclass impe_handling { funccall("AnalyzeImpe"); };
+ actionclass mainline_aue_iaue_handling
+ {
+     funccall("AnalyzeFetchAueIaue");
+-    calloutSelfLow;
++    calloutSelfLowNoGard;
+     threshold1;
+ };
+ 
+@@ -105,7 +105,7 @@ actionclass mainline_aue_iaue_handling
+ actionclass maintenance_aue_handling
+ {
+     funccall("AnalyzeMaintAue");
+-    calloutSelfLow;
++    calloutSelfLowNoGard;
+     threshold1;
+ };
+ 
+@@ -114,7 +114,7 @@ actionclass maintenance_iaue_handling
+ {
+     callout(connected(TYPE_DIMM,0), MRU_HIGH);
+     callout(connected(TYPE_DIMM,1), MRU_HIGH);
+-    calloutSelfLow;
++    calloutSelfLowNoGard;
+     threshold1;
+ };
+ 
+diff --git a/src/usr/diag/prdf/common/plat/p9/p9_proc_common_actions.rule b/src/usr/diag/prdf/common/plat/p9/p9_proc_common_actions.rule
+index 2ebd0d0..be2be01 100644
+--- a/src/usr/diag/prdf/common/plat/p9/p9_proc_common_actions.rule
++++ b/src/usr/diag/prdf/common/plat/p9/p9_proc_common_actions.rule
+@@ -26,7 +26,7 @@
+ actionclass level2_M_self_L_th_32perDay
+ {
+     callout2ndLvlMed;
+-    calloutSelfLow;
++    calloutSelfLowNoGard;
+     threshold32pday;
+ };
+ 
+-- 
+2.9.2.windows.1
+

@@ -1,7 +1,7 @@
-From dac2dec93f72abe7a4148e635a2c796ac175d720 Mon Sep 17 00:00:00 2001
+From 6cae90cb48e7a84d6938a59c7638d32a8b279a02 Mon Sep 17 00:00:00 2001
 From: Greg Still <stillgs@us.ibm.com>
 Date: Fri, 27 Oct 2017 06:06:35 -0500
-Subject: [PATCH] PM: Disable core hang buster
+Subject: [PATCH 4/4] PM: Disable core hang buster
 
 - Make default attribute control be DISABLED
 
