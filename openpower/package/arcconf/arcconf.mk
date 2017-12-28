@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ARCCONF_VERSION ?= b27b38b2fc59f99f0cb28f659fdfc54dea834d68
+ARCCONF_VERSION ?= cbf40a719bb7bee5521c2616ddb5bd6bdc7ce1a8
 ARCCONF_SITE ?= $(call github,supermicro,arcconf,$(ARCCONF_VERSION))
 
 ARCCONF_LICENSE = Apache-2.0
