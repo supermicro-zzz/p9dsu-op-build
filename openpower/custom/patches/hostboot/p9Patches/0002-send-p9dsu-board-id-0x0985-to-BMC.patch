@@ -1,7 +1,7 @@
-From d33bb449eab1674b39c8cc8509eae9ce1139f929 Mon Sep 17 00:00:00 2001
+From 917f8a0f07bdc939242eb3bf267918934acc1025 Mon Sep 17 00:00:00 2001
 From: jim <jim.yuan@supermicro.com>
 Date: Tue, 18 Apr 2017 10:49:09 -0700
-Subject: [PATCH 2/3] send p9dsu board id 0x0985 to BMC.
+Subject: [PATCH 2/5] send p9dsu board id 0x0985 to BMC.
 
 ---
  src/include/usr/ipmi/ipmiif.H                      |  6 ++++-
