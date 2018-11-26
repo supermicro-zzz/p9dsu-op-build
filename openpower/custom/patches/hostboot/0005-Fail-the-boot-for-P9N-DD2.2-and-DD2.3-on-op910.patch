@@ -1,4 +1,4 @@
-From 7325babf48ee419ea1488ffb7c74d690d4a7dbce Mon Sep 17 00:00:00 2001
+From 9caf1bde1674b03eaead111aac7328eac4c08466 Mon Sep 17 00:00:00 2001
 From: Corey Swenson <cswenson@us.ibm.com>
 Date: Tue, 30 Jan 2018 11:20:30 -0600
 Subject: [PATCH 5/5] Fail the boot for P9N DD2.2 and DD2.3 on op910
@@ -10,7 +10,7 @@ Change-Id: I371b46fe3ce8e1fcee283ec799276548ed0f450b
  2 files changed, 29 insertions(+), 9 deletions(-)
 
 diff --git a/src/include/arch/pvrformat.H b/src/include/arch/pvrformat.H
-index 2a2616dd4..dcf58da3d 100644
+index 2a2616dd4..3e233c50d 100644
 --- a/src/include/arch/pvrformat.H
 +++ b/src/include/arch/pvrformat.H
 @@ -5,7 +5,7 @@
@@ -55,7 +55,7 @@ index 2a2616dd4..dcf58da3d 100644
  
  #endif //_PVRFORMAT_H
 diff --git a/src/usr/isteps/istep06/host_set_ipl_parms.C b/src/usr/isteps/istep06/host_set_ipl_parms.C
-index cd2fe0f4c..072018fc8 100644
+index 5616770c6..f47980e6e 100644
 --- a/src/usr/isteps/istep06/host_set_ipl_parms.C
 +++ b/src/usr/isteps/istep06/host_set_ipl_parms.C
 @@ -80,28 +80,30 @@ void* host_set_ipl_parms( void *io_pArgs )
@@ -98,5 +98,5 @@ index cd2fe0f4c..072018fc8 100644
           *               your module or use a different driver
           * @custdesc     A problem occurred during the IPL
 -- 
-2.17.1.windows.2
+2.16.2.windows.1
 

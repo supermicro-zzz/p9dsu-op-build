@@ -1,4 +1,4 @@
-From 9dea084810c6d55b88e2e64a82854ebb27db05ac Mon Sep 17 00:00:00 2001
+From a69940b404a209ae670703c6248da87d57539cb3 Mon Sep 17 00:00:00 2001
 From: Corey Swenson <cswenson@us.ibm.com>
 Date: Tue, 30 Jan 2018 11:14:03 -0600
 Subject: [PATCH 4/5] Remove support for P9N (Nimbus) DD1.0
@@ -9,12 +9,12 @@ Subject: [PATCH 4/5] Remove support for P9N (Nimbus) DD1.0
 
 Change-Id: I8f14ba5669d811fde47c2630cfd71e3688710cca
 ---
- src/include/usr/isteps/istep_reasoncodes.H  |  4 +-
- src/usr/isteps/istep06/host_set_ipl_parms.C | 45 ++++++++++++++++++++-
+ src/include/usr/isteps/istep_reasoncodes.H  |  4 ++-
+ src/usr/isteps/istep06/host_set_ipl_parms.C | 45 ++++++++++++++++++++++++++++-
  2 files changed, 47 insertions(+), 2 deletions(-)
 
 diff --git a/src/include/usr/isteps/istep_reasoncodes.H b/src/include/usr/isteps/istep_reasoncodes.H
-index 48139a517..ef455bb6c 100644
+index 48139a517..dafd52702 100644
 --- a/src/include/usr/isteps/istep_reasoncodes.H
 +++ b/src/include/usr/isteps/istep_reasoncodes.H
 @@ -5,7 +5,7 @@
@@ -43,7 +43,7 @@ index 48139a517..ef455bb6c 100644
  
  };
 diff --git a/src/usr/isteps/istep06/host_set_ipl_parms.C b/src/usr/isteps/istep06/host_set_ipl_parms.C
-index 8fe9f12cc..cd2fe0f4c 100644
+index 8fe9f12cc..5616770c6 100644
 --- a/src/usr/isteps/istep06/host_set_ipl_parms.C
 +++ b/src/usr/isteps/istep06/host_set_ipl_parms.C
 @@ -5,7 +5,7 @@
@@ -113,5 +113,5 @@ index 8fe9f12cc..cd2fe0f4c 100644
  
      return l_stepError.getErrorHandle();
 -- 
-2.17.1.windows.2
+2.16.2.windows.1
 

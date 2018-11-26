@@ -1,4 +1,4 @@
-From 2f4652b25e6cc0fa4886011c986d9a2d89a37823 Mon Sep 17 00:00:00 2001
+From f0fe3d72bb18a5180b2b9a2d65d0bc5de5b37bfa Mon Sep 17 00:00:00 2001
 From: Jim Yuan <jim.yuan@supermicro.com>
 Date: Wed, 18 Oct 2017 11:38:08 -0700
 Subject: [PATCH 3/5] Fix hdatBmcFamily string is overwritten.
@@ -18,7 +18,7 @@ Reviewed-by: Daniel M. Crowell <dcrowell@us.ibm.com>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/src/usr/hdat/hdatspsubsys.C b/src/usr/hdat/hdatspsubsys.C
-index 172bc994e..dbd46740d 100755
+index 172bc994e..033dc7e7e 100755
 --- a/src/usr/hdat/hdatspsubsys.C
 +++ b/src/usr/hdat/hdatspsubsys.C
 @@ -7,6 +7,7 @@
@@ -42,5 +42,5 @@ index 172bc994e..dbd46740d 100755
          else
          {
 -- 
-2.17.1.windows.2
+2.16.2.windows.1
 

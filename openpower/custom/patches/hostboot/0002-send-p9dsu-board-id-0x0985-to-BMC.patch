@@ -1,17 +1,17 @@
-From a8e4c028402e648442784230e6acd1ce802496eb Mon Sep 17 00:00:00 2001
+From f9a0044abd11112b428b4d2e116c19a053d4d870 Mon Sep 17 00:00:00 2001
 From: jim <jim.yuan@supermicro.com>
 Date: Tue, 18 Apr 2017 10:49:09 -0700
 Subject: [PATCH 2/5] send p9dsu board id 0x0985 to BMC.
 
 ---
- src/include/usr/ipmi/ipmiif.H                 |  6 +++-
- src/include/usr/ipmi/ipmipowerstate.H         |  2 +-
- .../istepdispatcher/istepdispatcher.C         | 11 +++++++
- src/usr/ipmi/ipmipowerstate.C                 | 29 +++++++++++++++++++
+ src/include/usr/ipmi/ipmiif.H                      |  6 ++++-
+ src/include/usr/ipmi/ipmipowerstate.H              |  2 +-
+ .../initservice/istepdispatcher/istepdispatcher.C  | 11 ++++++++
+ src/usr/ipmiext/ipmipowerstate.C                   | 29 ++++++++++++++++++++++
  4 files changed, 46 insertions(+), 2 deletions(-)
 
 diff --git a/src/include/usr/ipmi/ipmiif.H b/src/include/usr/ipmi/ipmiif.H
-index 624ba4aff..092d7a0e3 100644
+index 502adc40c..6d9164ceb 100644
 --- a/src/include/usr/ipmi/ipmiif.H
 +++ b/src/include/usr/ipmi/ipmiif.H
 @@ -294,7 +294,11 @@ namespace IPMI
@@ -28,7 +28,7 @@ index 624ba4aff..092d7a0e3 100644
      // Used to create an empty message for reception
      inline const command_t no_command(void)
 diff --git a/src/include/usr/ipmi/ipmipowerstate.H b/src/include/usr/ipmi/ipmipowerstate.H
-index b65275075..667bbe699 100644
+index b65275075..e943e8b66 100644
 --- a/src/include/usr/ipmi/ipmipowerstate.H
 +++ b/src/include/usr/ipmi/ipmipowerstate.H
 @@ -78,7 +78,7 @@ enum ACPI_DEVICE_POWER_STATE_TO_SET
@@ -41,7 +41,7 @@ index b65275075..667bbe699 100644
  
  #endif
 diff --git a/src/usr/initservice/istepdispatcher/istepdispatcher.C b/src/usr/initservice/istepdispatcher/istepdispatcher.C
-index a6ebbd497..f63e9c70b 100644
+index a6ebbd497..80a970c2a 100644
 --- a/src/usr/initservice/istepdispatcher/istepdispatcher.C
 +++ b/src/usr/initservice/istepdispatcher/istepdispatcher.C
 @@ -287,6 +287,17 @@ void IStepDispatcher::init(errlHndl_t &io_rtaskRetErrl)
@@ -62,10 +62,10 @@ index a6ebbd497..f63e9c70b 100644
  #endif
  
          if(iv_istepMode)
-diff --git a/src/usr/ipmi/ipmipowerstate.C b/src/usr/ipmi/ipmipowerstate.C
-index 95d661a6e..3771a3ba0 100644
---- a/src/usr/ipmi/ipmipowerstate.C
-+++ b/src/usr/ipmi/ipmipowerstate.C
+diff --git a/src/usr/ipmiext/ipmipowerstate.C b/src/usr/ipmiext/ipmipowerstate.C
+index b76200d26..4969b3efe 100644
+--- a/src/usr/ipmiext/ipmipowerstate.C
++++ b/src/usr/ipmiext/ipmipowerstate.C
 @@ -51,6 +51,35 @@ namespace IPMI
  /******************************************************************************/
  // Functions
@@ -103,5 +103,5 @@ index 95d661a6e..3771a3ba0 100644
  errlHndl_t setACPIPowerState()
  {
 -- 
-2.17.1.windows.2
+2.16.2.windows.1
 
