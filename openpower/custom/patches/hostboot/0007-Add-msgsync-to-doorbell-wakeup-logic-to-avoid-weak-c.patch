@@ -1,7 +1,8 @@
-From 642b0e718bcdb0400d8dfeeb0612e6daef2b50c3 Mon Sep 17 00:00:00 2001
+From 147bdd8e25512041655c22fbb1e8d3f86eb8904e Mon Sep 17 00:00:00 2001
 From: Dan Crowell <dcrowell@us.ibm.com>
 Date: Fri, 18 Jan 2019 13:50:07 -0600
-Subject: [PATCH] Add msgsync to doorbell wakeup logic to avoid weak consistency bug
+Subject: [PATCH 1/2] Add msgsync to doorbell wakeup logic to avoid weak
+ consistency bug
 
 POWER9 added a new sync mode called 'msgsync' that is required
 to avoid weak consistency issues when you are using doorbell
@@ -30,9 +31,12 @@ ensure consistency.
 Change-Id: Ib0f3571926d71efcbffa205093278e2a1d58df85
 CQ: SW454611
 ---
+ src/include/arch/ppc.H | 16 +++++++++++++++-
+ src/kernel/syscall.C   |  8 +++++++-
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
 diff --git a/src/include/arch/ppc.H b/src/include/arch/ppc.H
-index e9e6b60..23dbcd3 100644
+index e9e6b6051..23dbcd370 100644
 --- a/src/include/arch/ppc.H
 +++ b/src/include/arch/ppc.H
 @@ -5,7 +5,7 @@
@@ -44,10 +48,11 @@ index e9e6b60..23dbcd3 100644
  /* [+] Google Inc.                                                        */
  /* [+] International Business Machines Corp.                              */
  /*                                                                        */
-@@ -226,6 +226,20 @@
+@@ -225,6 +225,20 @@ inline void eieio()
+     asm volatile("eieio" ::: "memory");
  }
  
- ALWAYS_INLINE
++ALWAYS_INLINE
 +inline void msgsync()
 +{
 +    // See POWER ISA 5.9.2 for details
@@ -61,12 +66,11 @@ index e9e6b60..23dbcd3 100644
 +}
 +
 +
-+ALWAYS_INLINE
+ ALWAYS_INLINE
  inline uint64_t getHMER()
  {
-     register uint64_t hmer = 0;
 diff --git a/src/kernel/syscall.C b/src/kernel/syscall.C
-index 580b30d..50add66 100644
+index 580b30d84..50add660b 100644
 --- a/src/kernel/syscall.C
 +++ b/src/kernel/syscall.C
 @@ -5,7 +5,7 @@
@@ -78,7 +82,7 @@ index 580b30d..50add66 100644
  /* [+] International Business Machines Corp.                              */
  /*                                                                        */
  /*                                                                        */
-@@ -54,6 +54,12 @@
+@@ -54,6 +54,12 @@ namespace KernelIpc
  extern "C"
  void kernel_execute_hype_doorbell()
  {
@@ -91,3 +95,6 @@ index 580b30d..50add66 100644
      task_t* t = TaskManager::getCurrentTask();
      doorbell_clear();
  
+-- 
+2.20.1.windows.1
+

@@ -1,7 +1,7 @@
-From 9e1f6c0234b17b5ac90caaf531a01862f5b4d915 Mon Sep 17 00:00:00 2001
+From 9d68ba951ad91387ec6fcfd7dd58cdd0ddb0890d Mon Sep 17 00:00:00 2001
 From: Dan Crowell <dcrowell@us.ibm.com>
 Date: Tue, 22 Jan 2019 15:32:10 -0600
-Subject: [PATCH] Add retry to slave core wakeup path
+Subject: [PATCH 2/2] Add retry to slave core wakeup path
 
 We are still seeing some very intermittent errors in the slave
 core wakeup path.  It still seems like we may have a timing issue.
@@ -12,17 +12,17 @@ core that didn't report in.
 
 Change-Id: Ib87e5d58e079674d1eebb44c10d0252a35ea0519
 ---
- src/include/kernel/cpumgr.H                        | 11 ++++++-
- src/include/kernel/syscalls.H                      |  4 ++-
- src/include/sys/misc.h                             | 18 ++++++++++-
- src/kernel/cpumgr.C                                | 37 ++++++++++++++++++++--
- src/kernel/syscall.C                               | 11 +++++++
- src/lib/syscall_misc.C                             | 10 +++++-
- .../istep16/call_host_activate_slave_cores.C       | 17 +++++++++-
+ src/include/kernel/cpumgr.H                   | 11 +++++-
+ src/include/kernel/syscalls.H                 |  4 +-
+ src/include/sys/misc.h                        | 18 ++++++++-
+ src/kernel/cpumgr.C                           | 37 ++++++++++++++++++-
+ src/kernel/syscall.C                          | 11 ++++++
+ src/lib/syscall_misc.C                        | 10 ++++-
+ .../istep16/call_host_activate_slave_cores.C  | 17 ++++++++-
  7 files changed, 101 insertions(+), 7 deletions(-)
 
 diff --git a/src/include/kernel/cpumgr.H b/src/include/kernel/cpumgr.H
-index da669bd..c6695b8 100644
+index da669bdd8..c6695b8a7 100644
 --- a/src/include/kernel/cpumgr.H
 +++ b/src/include/kernel/cpumgr.H
 @@ -5,7 +5,7 @@
@@ -51,7 +51,7 @@ index da669bd..c6695b8 100644
           * Force the memory free / coalesce operations to be performed on the
           * next "periodic" interval.
 diff --git a/src/include/kernel/syscalls.H b/src/include/kernel/syscalls.H
-index 951f55f..157b057 100644
+index 951f55fac..157b057a7 100644
 --- a/src/include/kernel/syscalls.H
 +++ b/src/include/kernel/syscalls.H
 @@ -5,7 +5,7 @@
@@ -73,7 +73,7 @@ index 951f55f..157b057 100644
              /** mm_alloc_block() */
          MM_ALLOC_BLOCK,
 diff --git a/src/include/sys/misc.h b/src/include/sys/misc.h
-index cf8b6a9..52d6f9e 100644
+index cf8b6a93b..52d6f9eaf 100644
 --- a/src/include/sys/misc.h
 +++ b/src/include/sys/misc.h
 @@ -5,7 +5,7 @@
@@ -109,7 +109,7 @@ index cf8b6a9..52d6f9e 100644
   *  @brief Forces a Terminate Immediate after a crit-assert is issued
   *  @param[in] i_failAddr - value in the linkRegister of the address
 diff --git a/src/kernel/cpumgr.C b/src/kernel/cpumgr.C
-index 2469ad3..c0f364e 100644
+index 2469ad36b..c0f364e53 100644
 --- a/src/kernel/cpumgr.C
 +++ b/src/kernel/cpumgr.C
 @@ -5,7 +5,7 @@
@@ -171,7 +171,7 @@ index 2469ad3..c0f364e 100644
  {
      size_t threads = 0;
 diff --git a/src/kernel/syscall.C b/src/kernel/syscall.C
-index 50add66..965f2ef 100644
+index 50add660b..965f2ef9c 100644
 --- a/src/kernel/syscall.C
 +++ b/src/kernel/syscall.C
 @@ -54,6 +54,8 @@ namespace KernelIpc
@@ -214,7 +214,7 @@ index 50add66..965f2ef 100644
       * Allocate a block of virtual memory within the base segment
       * @param[in] t: The task used to allocate a block in the base segment
 diff --git a/src/lib/syscall_misc.C b/src/lib/syscall_misc.C
-index fd8d76b..de58c44 100644
+index fd8d76b62..de58c4416 100644
 --- a/src/lib/syscall_misc.C
 +++ b/src/lib/syscall_misc.C
 @@ -5,7 +5,7 @@
@@ -242,7 +242,7 @@ index fd8d76b..de58c44 100644
  void cpu_crit_assert(uint64_t i_failAddr)
  {
 diff --git a/src/usr/isteps/istep16/call_host_activate_slave_cores.C b/src/usr/isteps/istep16/call_host_activate_slave_cores.C
-index a6bff19..3056277 100644
+index a6bff1970..305627731 100644
 --- a/src/usr/isteps/istep16/call_host_activate_slave_cores.C
 +++ b/src/usr/isteps/istep16/call_host_activate_slave_cores.C
 @@ -5,7 +5,7 @@
@@ -284,5 +284,5 @@ index a6bff19..3056277 100644
                  // occurred
                  l_stepError.addErrorDetails( l_errl );
 -- 
-1.8.2.2
+2.20.1.windows.1
 
