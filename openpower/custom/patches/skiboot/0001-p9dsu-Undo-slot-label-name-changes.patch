@@ -1,4 +1,4 @@
-From 0b9439e673180606100b6a8bcebecb5764dff3b8 Mon Sep 17 00:00:00 2001
+From ba6c6ee68119c6401e5090a59512944abfffdfe5 Mon Sep 17 00:00:00 2001
 From: Deb McLemore <debmc@linux.ibm.com>
 Date: Mon, 11 Mar 2019 21:52:55 -0500
 Subject: [PATCH] p9dsu: Undo slot label name changes
@@ -14,58 +14,13 @@ commit 31231ed300f2 ("p9dsu: Fix p9dsu default variant")
 
 Signed-off-by: Deb McLemore <debmc@linux.ibm.com>
 ---
- platforms/astbmc/p9dsu.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ platforms/astbmc/p9dsu.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/platforms/astbmc/p9dsu.c b/platforms/astbmc/p9dsu.c
-index d28bfca..eeb8fd7 100644
+index 27004164..eeb8fd76 100644
 --- a/platforms/astbmc/p9dsu.c
 +++ b/platforms/astbmc/p9dsu.c
-@@ -100,7 +100,7 @@ static const struct slot_table_entry p9dsu1u_phb8_1_slot[] = {
- 	{
- 		.etype = st_pluggable_slot,
- 		.location = ST_LOC_DEVFN(0,0),
--		.name = "WIO-R Slot2",
-+		.name = "WIO-R Slot",
- 		.power_limit = 75,
- 	},
- 	{ .etype = st_end },
-@@ -120,7 +120,7 @@ static const struct slot_table_entry p9dsu1u_phb8_3_slot[] = {
- 	{
- 		.etype = st_pluggable_slot,
- 		.location = ST_LOC_DEVFN(0,0),
--		.name = "WIO Slot4",
-+		.name = "WIO Slot2",
- 		.power_limit = 75,
- 	},
- 	{ .etype = st_end },
-@@ -251,7 +251,7 @@ static const struct slot_table_entry p9dsu2u_phb8_1_slot[] = {
- 	{
- 		.etype = st_pluggable_slot,
- 		.location = ST_LOC_DEVFN(0,0),
--		.name = "WIO-R Slot2",
-+		.name = "WIO-R Slot",
- 		.power_limit = 75,
- 	},
- 	{ .etype = st_end },
-@@ -271,7 +271,7 @@ static const struct slot_table_entry p9dsu2u_phb8_3_slot[] = {
- 	{
- 		.etype = st_pluggable_slot,
- 		.location = ST_LOC_DEVFN(0,0),
--		.name = "WIO Slot4",
-+		.name = "WIO Slot3",
- 		.power_limit = 75,
- 	},
- 	{ .etype = st_end },
-@@ -281,7 +281,7 @@ static const struct slot_table_entry p9dsu2u_phb8_4_slot[] = {
- 	{
- 		.etype = st_pluggable_slot,
- 		.location = ST_LOC_DEVFN(0,0),
--		.name = "WIO Slot5",
-+		.name = "WIO Slot2",
- 		.power_limit = 75,
- 	},
- 	{ .etype = st_end },
 @@ -357,13 +357,13 @@ static const struct slot_table_entry p9dsu2uess_uio_plx_down[] = {
  	{
  		.etype = st_pluggable_slot,
@@ -160,5 +115,5 @@ index d28bfca..eeb8fd7 100644
  	},
  	{ .etype = st_end },
 -- 
-2.7.4
+2.21.0.windows.1
 
