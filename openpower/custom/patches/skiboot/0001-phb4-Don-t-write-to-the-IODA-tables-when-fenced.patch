@@ -1,4 +1,4 @@
-From e6784893aa67b2a3ba51a3781d70e42578d62830 Mon Sep 17 00:00:00 2001
+From 66380539ea7312f242bf23d9f54ff5540a75811b Mon Sep 17 00:00:00 2001
 From: Oliver O'Halloran <oohall@gmail.com>
 Date: Fri, 18 Jan 2019 14:33:51 +1100
 Subject: [PATCH] phb4: Don't write to the IODA tables when fenced
@@ -9,7 +9,7 @@ Signed-off-by: Oliver O'Halloran <oohall@gmail.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/hw/phb4.c b/hw/phb4.c
-index cd1b14c7..b3eed8a9 100644
+index cd1b14c7..ec6bc305 100644
 --- a/hw/phb4.c
 +++ b/hw/phb4.c
 @@ -154,6 +154,8 @@ static bool pci_eeh_mmio;
@@ -32,5 +32,5 @@ index cd1b14c7..b3eed8a9 100644
  	phb4_ioda_sel(p, IODA3_TBL_PESTA, 0, false);
  	out_be64(p->regs + PHB_IODA_DATA0, 0);
 -- 
-2.20.1.windows.1
+2.21.0.windows.1
 
